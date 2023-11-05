@@ -3,6 +3,7 @@ import Dexie, { type Table } from 'dexie';
 interface Library{//词库
     id?:number;
     name:string;
+    about?:string
 }
 interface Library_Word{
     id?:number;
@@ -27,7 +28,7 @@ interface Study{//学习进度
     next:number,//下次复习时间
 }
 
-class WordsDatabase extends Dexie {
+export class WordsDatabase extends Dexie {
     public words!: Table<Word, number>; // id is number in this case
     public sentence!: Table<Sentence, number>;
     public stuby!: Table<Study,number>;
@@ -47,14 +48,37 @@ class WordsDatabase extends Dexie {
 }
 export const DB = new WordsDatabase();
 
-class WordPrototype implements Word{
+interface DBUpdate{
+    /**
+     * 将修改更新到数据库
+     */
+    update:()=>Promise<void>;
+}
+
+export class WordPrototype implements Word,DBUpdate{
     id?: number;
     word!: string;
+
+    async update(){
+        await DB.words.put({
+            id:this.id,
+            word:this.word
+        })
+    }
 }
 //代表一个词库
-class LibraryPrototype implements Library{
+export class LibraryPrototype implements Library,DBUpdate{
     id?: number;
     name!: string;
+    about?: string;
+
+    async update(){
+        await DB.library.put({
+            id:this.id,
+            name:this.name,
+            about:this.about
+        });
+    }
     /**
      * 添加词语到词库
      */
@@ -63,8 +87,9 @@ class LibraryPrototype implements Library{
         let qurt =  DB.words.where("word").equals(word);
         let wordObj = await qurt.first();
         if(!wordObj){
-            let wordid = await DB.words.add({word:word});
-            wordObj = {id:wordid,word:word};
+            let addobj = {word:word};
+            let wordid = await DB.words.add(addobj);
+            wordObj = {id:wordid,...addobj};
         }
         
     
@@ -72,8 +97,9 @@ class LibraryPrototype implements Library{
         let qurt2 = DB.library_word.where("wordid").equals(wordObj!.id!).and((obj)=>{return obj.libraryid==this.id});
         let library_wordObj:Library_Word | undefined = await qurt2.first();
         if(!library_wordObj){
-            let theID = await DB.library_word.add({libraryid:this.id!,wordid:wordObj.id!});
-            library_wordObj = {id:theID,libraryid:this.id!,wordid:wordObj.id!};
+            let addobj = {libraryid:this.id!,wordid:wordObj.id!};
+            let theID = await DB.library_word.add(addobj);
+            library_wordObj = {id:theID,...addobj};
         }
 
         Object.setPrototypeOf(wordObj,WordPrototype);
@@ -103,9 +129,10 @@ export const LibraryManager = {
      * 创建词库
      * @returns 词库
      */
-    async create(name:string):Promise<LibraryPrototype>{
-        let id = await DB.library.add({name:name});
-        let obj:Library = {id:id,name:name};
+    async create(name:string,about?: string):Promise<LibraryPrototype>{
+        let addobj = {name:name,about:about};
+        let id = await DB.library.add(addobj);
+        let obj:Library = {id:id,...addobj};
         Object.setPrototypeOf(obj,LibraryPrototype);
         return obj as LibraryPrototype;
     },

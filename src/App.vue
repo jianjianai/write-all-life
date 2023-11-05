@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import { DB } from './db';
+import {DB,LibraryManager} from './db';
 import { onBeforeMount, onBeforeUnmount, onMounted, reactive, watch, watchEffect } from 'vue';
 let html = document.querySelector("html");
 let body = document.querySelector("body");
 onMounted(() => {
   window.DB = DB;
+  window.LibraryManager = LibraryManager;
 });
 let appsize = reactive({
   width: 0,
@@ -43,30 +44,10 @@ watchEffect(() => {
 <template>
   <div class="app">
     <RouterView />
-
-    <header class="header">
-      <RouterLink class="link" to="/">学习</RouterLink>
-      <RouterLink class="link" to="/about">词汇</RouterLink>
-    </header>
   </div>
 </template>
 
-<style>
-.link {
-  margin: 1rem;
-}
-
-.header {
-  bottom: 0;
-  position: absolute;
-  height: 10rem;
-  width: 100%;
-  border: 1px solid black;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-}
-
+<style scoped>
 .app {
   width: v-bind("`${appsize.width}px`");
   height: v-bind("`${appsize.height}px`");
@@ -76,9 +57,7 @@ watchEffect(() => {
   top: 50%;
   transform: translate(-50%, -50%);
   overflow: hidden;
-}
-
-.app>* {
   font-size: 5rem;
 }
+
 </style>
