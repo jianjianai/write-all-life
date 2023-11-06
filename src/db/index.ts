@@ -1,8 +1,8 @@
 import { type LibraryPrototype,type StudyPrototype,type WordPrototype,type DBUpdate } from "./class"
-import { LibraryManager, StudyManager } from "./manager"
+import { LibraryManager, SentenceManager, StudyManager, WordsManager } from "./manager"
 
 
 export {
     type LibraryPrototype,type StudyPrototype,type WordPrototype,type DBUpdate,
-    LibraryManager, StudyManager
+    LibraryManager, StudyManager,WordsManager,SentenceManager
 }

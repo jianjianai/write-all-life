@@ -1,5 +1,6 @@
 import { DB, type Study } from "../dexie";
-import { type DBUpdate } from ".";
+import { WordPrototype, type DBUpdate } from ".";
+import { WordsManager } from "..";
 
 export default class StudyPrototype implements Study, DBUpdate {
     constructor() { throw new Error("不可使用构造方法构造！"); }
@@ -22,5 +23,9 @@ export default class StudyPrototype implements Study, DBUpdate {
         }
         await DB.stuby.put({ id: this.id, wordid: this.wordid, schedule: this.schedule, next: this.next });
     };
+
+    async getWord():Promise<WordPrototype>{
+        return (await WordsManager.get(this.wordid))!;
+    }
 
 }
