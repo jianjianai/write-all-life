@@ -3,14 +3,18 @@ import { LibraryManager, LibraryPrototype } from '@/db';
 import { onMounted, ref, type Ref } from 'vue';
 
 //显示题库列表
-let libraryArray: Ref<LibraryPrototype[] | undefined> = ref(undefined);
+const libraryArray: Ref<LibraryPrototype[] | undefined> = ref(undefined);
 onMounted(async () => {
     libraryArray.value = await LibraryManager.array();
 })
 
 //创建题库
-let inputName = ref("");
-let inputAbout = ref("");
+const inputName = ref("");
+const inputAbout = ref("");
+const createClick = ()=>{
+
+}
+
 //TODO
 
 </script>
@@ -46,7 +50,7 @@ let inputAbout = ref("");
                 <span>简介</span><input type="text" v-model="inputAbout">
             </div>
             <div>
-                <button>创建词库</button>
+                <button @click="createClick">创建词库</button>
             </div>
         </div>
     </div>
