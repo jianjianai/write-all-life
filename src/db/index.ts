@@ -81,8 +81,10 @@ export class LibraryPrototype implements Library,DBUpdate{
     }
     /**
      * 添加词语到词库
+     * @returns addNew:是否添加了新的，word:这个新的对象或者是已经存在的对象
      */
-    async addWord(word:string):Promise<WordPrototype>{
+    async addWord(word:string):Promise<{addNew:boolean,word:WordPrototype}>{
+        let addnew = false;
         //添加词语
         let qurt =  DB.words.where("word").equals(word);
         let wordObj = await qurt.first();
@@ -100,11 +102,12 @@ export class LibraryPrototype implements Library,DBUpdate{
             let addobj = {libraryid:this.id!,wordid:wordObj.id!};
             let theID = await DB.library_word.add(addobj);
             library_wordObj = {id:theID,...addobj};
+            addnew = true;
         }
 
         Object.setPrototypeOf(wordObj,WordPrototype.prototype);
         let wordPrototype:WordPrototype = wordObj as WordPrototype;
-        return wordPrototype;
+        return {addNew:addnew,word:wordPrototype};
     }
     /**
      * 获取全部词语

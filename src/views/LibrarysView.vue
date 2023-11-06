@@ -23,7 +23,7 @@ onMounted(async () => {
                 </div>
             </template>
             <template v-else>
-                <RouterLink v-for="{ id, name, about } of libraryArray" class="li" :to="`/library/${id}`">
+                <RouterLink v-for="{ id, name, about } of libraryArray" :key="id" class="li" :to="`/library/${id}`">
                     <h5 v-if="name">{{ name }}</h5>
                     <p v-if="about">{{ about }}</p>
                 </RouterLink>
