@@ -1,5 +1,5 @@
 import { type DBUpdate ,WordPrototype} from ".";
-import { DB, type Library, type Library_Word } from "@/db/dexie";
+import { DB, type Library, type Library_Word } from "../dexie";
 
 
 //代表一个词库

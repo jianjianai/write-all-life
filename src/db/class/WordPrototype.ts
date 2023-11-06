@@ -1,4 +1,4 @@
-import { DB, type Word } from "@/db/dexie";
+import { DB, type Word } from "../dexie";
 import { type DBUpdate } from ".";
 
 

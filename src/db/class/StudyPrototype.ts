@@ -1,4 +1,4 @@
-import { DB, type Study } from "@/db/dexie";
+import { DB, type Study } from "../dexie";
 import { type DBUpdate } from ".";
 
 export default class StudyPrototype implements Study, DBUpdate {
