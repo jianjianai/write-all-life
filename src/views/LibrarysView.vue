@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LibraryManager, LibraryPrototype } from '@/db';
+import { LibraryManager, type LibraryPrototype } from '@/db';
 import { onMounted, ref, type Ref } from 'vue';
 
 //显示题库列表
@@ -9,10 +9,23 @@ onMounted(async () => {
 })
 
 //创建题库
+const createError:Ref<any> = ref();
 const inputName = ref("");
 const inputAbout = ref("");
-const createClick = ()=>{
-
+const createClick = async ()=>{
+    if(!libraryArray.value){
+        createError.value = "清等待加载完成";
+        return;
+    }
+    if(!inputName.value){
+        createError.value = "词库名称不能为空";
+        return;
+    }
+    let library = await LibraryManager.create(inputName.value,inputAbout.value);
+    libraryArray.value!.push(library);
+    inputName.value = '';
+    inputAbout.value = '';
+    createError.value = undefined;
 }
 
 //TODO
@@ -40,8 +53,7 @@ const createClick = ()=>{
                     <p v-if="about">{{ about }}</p>
                 </RouterLink>
             </template>
-        </div>
-        <div class="addLibrary">
+            <div class="addLibrary">
             <div class="title">创建词库</div>
             <div>
                 <span>名称</span><input type="text" v-model="inputName">
@@ -49,14 +61,22 @@ const createClick = ()=>{
             <div>
                 <span>简介</span><input type="text" v-model="inputAbout">
             </div>
+            <div class="crateError" v-if="createError">
+                {{ createError }}
+            </div>
             <div>
                 <button @click="createClick">创建词库</button>
             </div>
+        </div>
         </div>
     </div>
 </template>
   
 <style scoped>
+.crateError{
+    font-size: 2rem;
+    color: red;
+}
 .addLibrary > .title{
     font-size: 3rem;
     font-weight: 700;
@@ -105,4 +125,6 @@ const createClick = ()=>{
     font-size: 3rem;
 }
 </style>
-  
+  import { LibraryPrototype } from "@/db/LibraryPrototype";
+import { LibraryManager } from "@/db/LibraryManager";
+@/db/manager

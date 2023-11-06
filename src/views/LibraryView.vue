@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LibraryManager } from '@/db';
+import { LibraryManager } from '@/db/manager/index.js';
 import { onMounted, ref, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { type LibraryPrototype, type WordPrototype } from "@/db"
@@ -13,7 +13,7 @@ const words: Ref<WordPrototype[] | undefined> = ref(undefined);
 onMounted(async () => {
     try {
         library.value = await LibraryManager.get(parseInt(libraryid as string));
-        words.value = await library.value?.WordArray();
+        words.value = await library.value?.wordArray();
     } catch (e) {
         error.value = e;
     }
@@ -98,7 +98,7 @@ const addButtonClick = async () => {
   
 <style scoped>
 .addError {
-    font-size: 1rem;
+    font-size: 2rem;
     color: red;
 }
 
@@ -163,4 +163,7 @@ const addButtonClick = async () => {
     font-size: 4rem;
 }
 </style>
-  
+  import { type WordPrototype } from "@/db/WordPrototype";
+import { type LibraryPrototype } from "@/db/LibraryPrototype";
+import { LibraryManager } from "@/db/LibraryManager";
+@/db/manager@/db/manager

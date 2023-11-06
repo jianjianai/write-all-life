@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import {DB,LibraryManager} from './db';
+import {DB} from './db/dexie';
 import { onBeforeMount, onBeforeUnmount, onMounted, reactive, watch, watchEffect } from 'vue';
+import { LibraryManager } from './db';
 let html = document.querySelector("html");
 let body = document.querySelector("body");
 onMounted(() => {
@@ -61,3 +62,5 @@ watchEffect(() => {
 }
 
 </style>
+import { LibraryManager } from "./db/LibraryManager";
+./db/manager
