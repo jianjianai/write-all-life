@@ -52,7 +52,7 @@ onMounted(async () => {
                         loinging..
                     </div>
                     <div v-else class="wordList">
-                        <div v-for="{word} in words">
+                        <div v-for="{word} in words" class="wordDiv">
                             {{ word }}
                         </div>
                     </div>
@@ -63,6 +63,23 @@ onMounted(async () => {
 </template>
   
 <style scoped>
+.wordList{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: center;
+}
+.wordDiv{
+    border-bottom: 1px solid rgba(0, 0, 0, 0.192);
+    /* border-radius: 2rem; */
+    min-height: 5rem;
+    min-width: 14rem;
+    padding: 1rem;
+    /* margin: 0.5rem; */
+    font-size: 3rem;
+}
 .body {
     padding-top: 2rem;
     overflow: auto;
