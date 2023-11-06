@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import { LibraryManager, LibraryPrototype } from '@/db';
 import { onMounted, ref, type Ref } from 'vue';
+
+//显示题库列表
 let libraryArray: Ref<LibraryPrototype[] | undefined> = ref(undefined);
 onMounted(async () => {
     libraryArray.value = await LibraryManager.array();
 })
+
+//创建题库
+let inputName = ref("");
+let inputAbout = ref("");
+//TODO
+
 </script>
 <template>
     <div class="page">
@@ -29,10 +37,30 @@ onMounted(async () => {
                 </RouterLink>
             </template>
         </div>
+        <div class="addLibrary">
+            <div class="title">创建词库</div>
+            <div>
+                <span>名称</span><input type="text" v-model="inputName">
+            </div>
+            <div>
+                <span>简介</span><input type="text" v-model="inputAbout">
+            </div>
+            <div>
+                <button>创建词库</button>
+            </div>
+        </div>
     </div>
 </template>
   
 <style scoped>
+.addLibrary > .title{
+    font-size: 3rem;
+    font-weight: 700;
+}
+.addLibrary{
+    padding: 2rem;
+    font-size: 2rem;
+}
 .page{
     height: 100%;
     position: relative;
