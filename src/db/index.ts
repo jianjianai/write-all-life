@@ -102,7 +102,7 @@ export class LibraryPrototype implements Library,DBUpdate{
             library_wordObj = {id:theID,...addobj};
         }
 
-        Object.setPrototypeOf(wordObj,WordPrototype);
+        Object.setPrototypeOf(wordObj,WordPrototype.prototype);
         let wordPrototype:WordPrototype = wordObj as WordPrototype;
         return wordPrototype;
     }
@@ -115,7 +115,7 @@ export class LibraryPrototype implements Library,DBUpdate{
         for(const library_wordObj of  library_wordObjArray){
             let word = await DB.words.get(library_wordObj.wordid);
             if(word){
-                Object.setPrototypeOf(word,WordPrototype);
+                Object.setPrototypeOf(word,WordPrototype.prototype);
                 let wordPrototype:WordPrototype = word as WordPrototype;
                 words.push(wordPrototype);
             }
@@ -133,7 +133,7 @@ export const LibraryManager = {
         let addobj = {name:name,about:about};
         let id = await DB.library.add(addobj);
         let obj:Library = {id:id,...addobj};
-        Object.setPrototypeOf(obj,LibraryPrototype);
+        Object.setPrototypeOf(obj,LibraryPrototype.prototype);
         return obj as LibraryPrototype;
     },
     /**
@@ -142,9 +142,20 @@ export const LibraryManager = {
     async array():Promise<Array<LibraryPrototype>>{
         let array = await DB.library.toArray();
         for(const the of array){
-            Object.setPrototypeOf(the,LibraryPrototype);
+            Object.setPrototypeOf(the,LibraryPrototype.prototype);
         }
         return array as Array<LibraryPrototype>;
+    },
+    /**
+     * 获取摸个id的词库
+     */
+    async get(id:number):Promise<LibraryPrototype | null>{
+        let theObj = await DB.library.get(id);
+        if(!theObj){
+            return null;
+        }
+        Object.setPrototypeOf(theObj,LibraryPrototype.prototype);
+        return theObj as LibraryPrototype;
     }
 }
 

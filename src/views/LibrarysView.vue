@@ -23,10 +23,10 @@ onMounted(async () => {
                 </div>
             </template>
             <template v-else>
-                <div v-for="{ id, name, about } of libraryArray" class="li">
+                <RouterLink v-for="{ id, name, about } of libraryArray" class="li" :to="`/library/${id}`">
                     <h5 v-if="name">{{ name }}</h5>
                     <p v-if="about">{{ about }}</p>
-                </div>
+                </RouterLink>
             </template>
         </div>
     </div>
@@ -59,6 +59,7 @@ onMounted(async () => {
 }
 
 .li {
+    display: block;
     border: 1px solid black;
     margin: 1rem;
     margin-bottom: 3rem;

@@ -5,16 +5,19 @@ const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     { 
-      path: '/', 
+      path: '/', name:'HomeView',
       component: () => import('@/views/HomeView.vue') 
     },
     { 
-      path: '/about', 
+      path: '/about', name:"AboutView",
       component: () => import('@/views/AboutView.vue') 
     },
     { 
-      path: '/words', 
-      component: () => import('@/views/WordsView.vue') 
+      path: '/library',name:"LibrarysView", 
+      component: () => import('@/views/LibrarysView.vue') 
+    },{
+      path:'/library/:libraryid([0-9]+)',name:"LibraryView",
+      component:()=> import('@/views/LibraryView.vue')
     }
   ]
 })
