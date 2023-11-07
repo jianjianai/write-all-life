@@ -44,7 +44,7 @@ const nextStudying = () => {
     return undefined;
   }
   let index = studyingIndex.value;
-  if (index + 1 >= studyingArray.value.length) {
+  if (index + 1 > studyingArray.value.length) {
     index = 0;
   }
   let theStudy = studyingArray.value[index];
@@ -56,8 +56,9 @@ const nextStudying = () => {
      * 如果当前单词已经完成背诵，替换成新的任务。
      */
     ok() {
-      theStudy.okTime--;
-      if (theStudy.okTime <= 0) {
+      theStudy.okTime = theStudy.okTime-1;
+      console.log(theStudy);
+      if (theStudy.okTime < 0) {
         if (needStudyArrays.value!.length > 0) {//如果有新的任务则替换
           let study = needStudyArrays.value!.shift();
           studyingArray.value[index] = new Studying(needStudyTime(study!), study!);
@@ -65,7 +66,7 @@ const nextStudying = () => {
           studyingArray.value.splice(index, 1);
         }
         //添加完成计数
-        studyCount.value++
+        studyCount.value = studyCount.value+1;
 
         //修改学习进度并保存
         theStudy.study.schedule++;
@@ -96,7 +97,6 @@ watch(studying, () => {
 });
 //加载词库
 const longing = ref(true);
-const watching = ref(false);
 StudyManager.getStudyingLibrary().then((studying) => {
   if (!studying) {
     throw "错误，当前没有使用任何题库！";
@@ -120,6 +120,25 @@ StudyManager.getStudyingLibrary().then((studying) => {
   loadNeedStudyArraysError.value = e;
 });
 
+const watching = ref(false);
+const inputWord = ref("");
+const message = ref("");
+const check = ()=>{
+  if(studyingWord.value?.word!=inputWord.value){
+    message.value = "error";
+    return;
+  }
+  if(!watching.value){
+    studying.value!.ok();
+  }else{
+    studying.value!.on();
+  }
+  inputWord.value = "";
+  message.value = '';
+  watching.value = false;
+  studying.value = nextStudying();
+}
+
 
 
 </script>
@@ -132,23 +151,32 @@ StudyManager.getStudyingLibrary().then((studying) => {
       <div class="hTitle">
         <p>学习 {{ studyCount }}/{{ needStudyNumber }}</p>
       </div>
+
+      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+      <div>{{ studyingIndex }}</div>
+      <div style="font-size: 3rem;"> {{ studying }}</div>
+
       <template v-if="!studyingWord">
         <div>loinging...</div>
       </template>
       <!-- 背 -->
       <template v-else-if="!watching">
         <div>
-          {{ studyingWord.word }}
+          {{ studyingWord.word }}::
         </div>
-        <input type="text">
-        <input type="button" value="不会">
+        <p>{{ message }}</p>
+        <input type="text" v-model="inputWord">
+        <input type="button" value="检查" @click="check">
+        <input type="button" value="不会" @click="watching=true">
       </template>
       <!-- 看 -->
       <template v-else>
         <div>
           {{ studyingWord.word }}
         </div>
-        <input type="text">
+        <p>{{ message }}</p>
+        <input type="text" v-model="inputWord">
+        <input type="button" value="检查" @click="check">
       </template>
     </template>
   </div>
