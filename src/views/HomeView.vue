@@ -1,4 +1,24 @@
 <script setup lang="ts">
+import { type LibraryPrototype, StudyManager, type StudyPrototype } from '@/db';
+import router from '@/router';
+import { type Ref, ref, onMounted } from 'vue';
+
+//当前选择的词库
+const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
+const studyingLibraryloinging = ref(true);
+const needStudyArrays:Ref<StudyPrototype[]|undefined> = ref(undefined);
+const needReviewArray:Ref<StudyPrototype[]|undefined> = ref(undefined);
+onMounted(async () => {
+  studyingLibrary.value = await StudyManager.getStudyingLibrary();
+  if(!studyingLibrary.value){
+    router.replace("/library");
+    return;
+  }
+  needStudyArrays.value = await StudyManager.newStudyArray(studyingLibrary.value);
+  needReviewArray.value = await StudyManager.needReviewArray(new Date());
+  studyingLibraryloinging.value = false;
+});
+
 
 </script>
 
@@ -8,14 +28,19 @@
       Good good study day day up!
     </div>
     <div class="start">
-      <div>
-        <h4>学习</h4>
-        <p>10</p>
-      </div>
-      <div>
-        <h4>复习</h4>
-        <p>20</p>
-      </div>
+      <template v-if="studyingLibraryloinging">
+        loging...
+      </template>
+      <template v-else>
+        <div>
+          <h4>学习</h4>
+          <p>{{needStudyArrays!.length}}</p>
+        </div>
+        <div>
+          <h4>复习</h4>
+          <p>{{ needReviewArray!.length }}</p>
+        </div>
+      </template>
     </div>
     <header class="header">
       <RouterLink class="link" to="/library">词库</RouterLink>
@@ -82,4 +107,5 @@
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-}</style>
+}
+</style>
