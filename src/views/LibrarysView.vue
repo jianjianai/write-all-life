@@ -77,7 +77,7 @@ const createClick = async () => {
             </template>
             <template v-else-if="libraryArray.length <= 0">
                 <div>
-                    null
+                    没有任何词库
                 </div>
             </template>
             <template v-else>
