@@ -32,14 +32,14 @@ onMounted(async () => {
         loging...
       </template>
       <template v-else>
-        <div>
+        <RouterLink class="studyButtln" to="/study">
           <h4>学习</h4>
           <p>{{needStudyArrays!.length}}</p>
-        </div>
-        <div>
+        </RouterLink>
+        <RouterLink  class="studyButtln" to="/">
           <h4>复习</h4>
           <p>{{ needReviewArray!.length }}</p>
-        </div>
+        </RouterLink>
       </template>
     </div>
     <header class="header">
@@ -51,19 +51,20 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.start>div>h4 {
+.start>.studyButtln>h4 {
   font-size: 5rem;
   margin: 0;
   padding: 0;
 }
 
-.start>div>p {
+.start>.studyButtln>p {
   font-size: 4rem;
   margin: 0;
   padding: 0;
 }
 
-.start>div {
+.start>.studyButtln {
+  display: block;
   width: 29rem;
   height: 15rem;
   border-radius: 3rem;
