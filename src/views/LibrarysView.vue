@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { LibraryManager, type LibraryPrototype } from '@/db';
+import { LibraryManager, StudyManager, type LibraryPrototype } from '@/db';
 import { onMounted, ref, type Ref } from 'vue';
 
 //显示题库列表
@@ -8,20 +8,34 @@ onMounted(async () => {
     libraryArray.value = await LibraryManager.array();
 })
 
+//当前选择的词库
+const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
+const studyingLibraryloinging = ref(true);
+onMounted(async () => {
+    studyingLibrary.value = await StudyManager.getStudyingLibrary();
+    studyingLibraryloinging.value = false;
+});
+
+//选择一个题库
+const selectStudyLibrary = async (library: LibraryPrototype) => {
+    studyingLibrary.value = library;
+    await StudyManager.setStudyingLibrary(library);
+}
+
 //创建题库
-const createError:Ref<any> = ref();
+const createError: Ref<any> = ref();
 const inputName = ref("");
 const inputAbout = ref("");
-const createClick = async ()=>{
-    if(!libraryArray.value){
+const createClick = async () => {
+    if (!libraryArray.value) {
         createError.value = "清等待加载完成";
         return;
     }
-    if(!inputName.value){
+    if (!inputName.value) {
         createError.value = "词库名称不能为空";
         return;
     }
-    let library = await LibraryManager.create(inputName.value,inputAbout.value);
+    let library = await LibraryManager.create(inputName.value, inputAbout.value);
     libraryArray.value!.push(library);
     inputName.value = '';
     inputAbout.value = '';
@@ -33,8 +47,27 @@ const createClick = async ()=>{
 </script>
 <template>
     <div class="page">
+        <!-- 当前词库 -->
         <div class="titile">
-            <p>词库</p>
+            <p>当前词库</p>
+        </div>
+        <div class="userLibrary">
+            <template v-if="studyingLibraryloinging">
+                <div>loinging...</div>
+            </template>
+            <template v-else-if="!studyingLibrary">
+                <div>
+                    当前没有选中任何词库
+                </div>
+            </template>
+            <RouterLink v-else class="li" :to="`/library/${studyingLibrary.id}`">
+                <h5 v-if="studyingLibrary.name">{{ studyingLibrary.name }}</h5>
+                <p v-if="studyingLibrary.about">{{ studyingLibrary.about }}</p>
+            </RouterLink>
+        </div>
+        <!-- 全部词库 -->
+        <div class="titile">
+            <p>全部词库</p>
         </div>
         <div class="list">
             <template v-if="!libraryArray">
@@ -44,48 +77,59 @@ const createClick = async ()=>{
             </template>
             <template v-else-if="libraryArray.length <= 0">
                 <div>
-                    null
+                    没有任何词库
                 </div>
             </template>
             <template v-else>
-                <RouterLink v-for="{ id, name, about } of libraryArray" :key="id" class="li" :to="`/library/${id}`">
-                    <h5 v-if="name">{{ name }}</h5>
-                    <p v-if="about">{{ about }}</p>
+                <RouterLink v-for="library of libraryArray" :key="library.id" class="li" :to="`/library/${library.id}`">
+                    <div class="shwo">
+                        <h5 v-if="library.name">{{ library.name }}</h5>
+                        <p v-if="library.about">{{ library.about }}</p>
+                    </div>
+                    <div class="click">
+                        <button v-if="library.id==studyingLibrary?.id" disabled>已选择</button>
+                        <button v-else @click.stop.prevent="selectStudyLibrary(library)">选择</button>
+                    </div>
                 </RouterLink>
             </template>
+
+            <!-- 创建题库 -->
             <div class="addLibrary">
-            <div class="title">创建词库</div>
-            <div>
-                <span>名称</span><input type="text" v-model="inputName">
+                <div class="title">创建词库</div>
+                <div>
+                    <span>名称</span><input type="text" v-model="inputName">
+                </div>
+                <div>
+                    <span>简介</span><input type="text" v-model="inputAbout">
+                </div>
+                <div class="crateError" v-if="createError">
+                    {{ createError }}
+                </div>
+                <div>
+                    <button @click="createClick">创建词库</button>
+                </div>
             </div>
-            <div>
-                <span>简介</span><input type="text" v-model="inputAbout">
-            </div>
-            <div class="crateError" v-if="createError">
-                {{ createError }}
-            </div>
-            <div>
-                <button @click="createClick">创建词库</button>
-            </div>
-        </div>
         </div>
     </div>
 </template>
   
 <style scoped>
-.crateError{
+.crateError {
     font-size: 2rem;
     color: red;
 }
-.addLibrary > .title{
+
+.addLibrary>.title {
     font-size: 3rem;
     font-weight: 700;
 }
-.addLibrary{
+
+.addLibrary {
     padding: 2rem;
     font-size: 2rem;
 }
-.page{
+
+.page {
     height: 100%;
     position: relative;
     display: flex;
@@ -94,12 +138,14 @@ const createClick = async ()=>{
     flex-wrap: nowrap;
     justify-content: flex-start;
 }
+
 .titile {
     font-size: 5rem;
     width: 100%;
-    background-color:antiquewhite;
+    background-color: antiquewhite;
 }
-.titile > p{
+
+.titile>p {
     margin: 2rem;
     margin-top: 0;
     margin-bottom: 0;
@@ -110,6 +156,10 @@ const createClick = async ()=>{
     overflow: auto;
 }
 
+.userLibrary {
+    padding-top: 2rem;
+}
+
 .li {
     display: block;
     border: 1px solid black;
@@ -117,14 +167,18 @@ const createClick = async ()=>{
     margin-bottom: 3rem;
     padding: 2rem;
 }
+.li > .shwo{
 
-.li > h5{
+}
+.li > .click{
+
+}
+
+.li> .shwo >h5 {
     font-size: 4rem;
 }
-.li > p{
+
+.li> .shwo> p {
     font-size: 3rem;
 }
 </style>
-  import { LibraryPrototype } from "@/db/LibraryPrototype";
-import { LibraryManager } from "@/db/LibraryManager";
-@/db/manager

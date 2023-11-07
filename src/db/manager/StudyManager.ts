@@ -1,3 +1,4 @@
+import { LibraryManager } from ".";
 import { LibraryPrototype, StudyPrototype, WordPrototype } from "../class";
 import { DB } from "../dexie";
 
@@ -30,5 +31,20 @@ export default {
             wordArray.push(await p);
         }
         return wordArray.filter((word) => { return (!word.id); });
+    },
+    //设置用户正在学习的词库
+    async setStudyingLibrary(library: LibraryPrototype){
+        localStorage.setItem("StudyingLibrary",library.id.toString());
+    },
+    /** 
+     * 获取用户正在学习的词库
+     * @returns null 用户没有正在学习的词库
+    */
+    async getStudyingLibrary():Promise<LibraryPrototype|null|undefined>{
+        let studying = localStorage.getItem("StudyingLibrary");
+        if(!studying){
+            return undefined;
+        }
+        return await LibraryManager.get(Number(studying));
     }
 };

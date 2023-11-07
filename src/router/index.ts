@@ -7,17 +7,18 @@ const router = createRouter({
     { 
       path: '/', name:'HomeView',
       component: () => import('@/views/HomeView.vue') 
-    },
-    { 
+    },{ 
       path: '/about', name:"AboutView",
       component: () => import('@/views/AboutView.vue') 
-    },
-    { 
+    },{ 
       path: '/library',name:"LibrarysView", 
       component: () => import('@/views/LibrarysView.vue') 
     },{
       path:'/library/:libraryid([0-9]+)',name:"LibraryView",
       component:()=> import('@/views/LibraryView.vue')
+    },{
+      path:"/study",name:"StudyView",
+      component:()=> import('@/views/StudyView.vue')
     }
   ]
 })
