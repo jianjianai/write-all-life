@@ -30,7 +30,7 @@ export default {
         for (const p of wordPromiseArray) {
             wordArray.push(await p);
         }
-        return wordArray.filter((word) => { return (!word.id); });
+        return wordArray.filter((word) => { return (!word.id || word.schedule<=1); });
     },
     //设置用户正在学习的词库
     async setStudyingLibrary(library: LibraryPrototype){
