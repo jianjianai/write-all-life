@@ -163,7 +163,3 @@ const addButtonClick = async () => {
     font-size: 4rem;
 }
 </style>
-  import { type WordPrototype } from "@/db/WordPrototype";
-import { type LibraryPrototype } from "@/db/LibraryPrototype";
-import { LibraryManager } from "@/db/LibraryManager";
-@/db/manager@/db/manager

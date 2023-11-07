@@ -18,7 +18,7 @@ let event = () => {
   let bodyWidth = body!.offsetWidth;
   let bodyHeight = body!.offsetHeight;
   let bi = bodyWidth / bodyHeight;
-  console.log(bi, bodyWidth, bodyHeight);
+  // console.log(bi, bodyWidth, bodyHeight);
   let height = bodyHeight;
   let width = bodyWidth;
   if (bi > 0.65) {

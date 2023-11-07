@@ -10,10 +10,10 @@ const needReviewArray:Ref<StudyPrototype[]|undefined> = ref(undefined);
 StudyManager.getStudyingLibrary().then((studying)=>{
   studyingLibrary.value = studying;
   studyingLibraryloinging.value = false;
-  if(!studyingLibrary.value){
+  if(!studying){
     return;
   }
-  StudyManager.newStudyArray(studyingLibrary.value).then((array)=>{
+  StudyManager.newStudyArray(studying).then((array)=>{
     needStudyArrays.value  = array;
   });
   StudyManager.needReviewArray(new Date()).then((array)=>{

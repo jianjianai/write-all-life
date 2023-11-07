@@ -167,12 +167,12 @@ const createClick = async () => {
     margin-bottom: 3rem;
     padding: 2rem;
 }
-.li > .shwo{
+/* .li > .shwo{
 
 }
 .li > .click{
 
-}
+} */
 
 .li> .shwo >h5 {
     font-size: 4rem;
