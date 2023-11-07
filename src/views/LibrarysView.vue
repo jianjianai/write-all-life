@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { LibraryManager, StudyManager, type LibraryPrototype } from '@/db';
-import { onMounted, ref, type Ref } from 'vue';
+import { ref, type Ref } from 'vue';
 
 //显示题库列表
 const libraryArray: Ref<LibraryPrototype[] | undefined> = ref(undefined);
-onMounted(async () => {
-    libraryArray.value = await LibraryManager.array();
-})
+LibraryManager.array().then((the)=>{
+    libraryArray.value = the;
+});
 
 //当前选择的词库
 const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
 const studyingLibraryloinging = ref(true);
-onMounted(async () => {
-    studyingLibrary.value = await StudyManager.getStudyingLibrary();
+StudyManager.getStudyingLibrary().then((the)=>{
+    studyingLibrary.value = the;
     studyingLibraryloinging.value = false;
 });
 

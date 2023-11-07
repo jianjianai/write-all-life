@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { LibraryManager } from '@/db/manager/index.js';
-import { onMounted, ref, type Ref } from 'vue';
+import { ref, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { type LibraryPrototype, type WordPrototype } from "@/db"
 
@@ -10,13 +10,13 @@ const { libraryid } = route.params;
 const library: Ref<LibraryPrototype | null> = ref(null);
 const error: Ref<any> = ref(undefined);
 const words: Ref<WordPrototype[] | undefined> = ref(undefined);
-onMounted(async () => {
-    try {
-        library.value = await LibraryManager.get(parseInt(libraryid as string));
-        words.value = await library.value?.wordArray();
-    } catch (e) {
-        error.value = e;
-    }
+LibraryManager.get(parseInt(libraryid as string)).then((the)=>{
+    library.value = the;
+    return the?.wordArray();
+}).then((the)=>{
+    words.value = the;
+}).catch((e)=>{
+    error.value = e;
 });
 
 //添加

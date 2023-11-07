@@ -1,24 +1,25 @@
 <script setup lang="ts">
 import { type LibraryPrototype, StudyManager, type StudyPrototype } from '@/db';
-import router from '@/router';
-import { type Ref, ref, onMounted } from 'vue';
+import { type Ref, ref } from 'vue';
 
 //当前选择的词库
 const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
 const studyingLibraryloinging = ref(true);
 const needStudyArrays:Ref<StudyPrototype[]|undefined> = ref(undefined);
 const needReviewArray:Ref<StudyPrototype[]|undefined> = ref(undefined);
-onMounted(async () => {
-  studyingLibrary.value = await StudyManager.getStudyingLibrary();
+StudyManager.getStudyingLibrary().then((studying)=>{
+  studyingLibrary.value = studying;
+  studyingLibraryloinging.value = false;
   if(!studyingLibrary.value){
-    router.replace("/library");
     return;
   }
-  needStudyArrays.value = await StudyManager.newStudyArray(studyingLibrary.value);
-  needReviewArray.value = await StudyManager.needReviewArray(new Date());
-  studyingLibraryloinging.value = false;
+  StudyManager.newStudyArray(studyingLibrary.value).then((array)=>{
+    needStudyArrays.value  = array;
+  });
+  StudyManager.needReviewArray(new Date()).then((array)=>{
+    needReviewArray.value = array;
+  });
 });
-
 
 </script>
 
@@ -31,14 +32,22 @@ onMounted(async () => {
       <template v-if="studyingLibraryloinging">
         loging...
       </template>
+      <template v-else-if="!studyingLibrary">
+        <RouterLink class="studyButtln" to="/library">
+          <h4>词库</h4>
+          <p>前往设置词库</p>
+        </RouterLink>
+      </template>
       <template v-else>
         <RouterLink class="studyButtln" to="/study">
           <h4>学习</h4>
-          <p>{{needStudyArrays!.length}}</p>
+          <p v-if="!needStudyArrays">loinging...</p>
+          <p v-else>{{needStudyArrays!.length}}</p>
         </RouterLink>
         <RouterLink  class="studyButtln" to="/">
           <h4>复习</h4>
-          <p>{{ needReviewArray!.length }}</p>
+          <p v-if="!needReviewArray">loinging...</p>
+          <p v-else>{{ needReviewArray!.length }}</p>
         </RouterLink>
       </template>
     </div>
