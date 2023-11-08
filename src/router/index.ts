@@ -18,7 +18,12 @@ const router = createRouter({
       component:()=> import('@/views/LibraryView.vue')
     },{
       path:"/study",name:"StudyView",
-      component:()=> import('@/views/StudyView.vue')
+      component:()=> import('@/views/StudyView.vue'),
+      props:{workType:"study"}
+    },{
+      path:"/review",name:"StudyView-review",
+      component:()=> import('@/views/StudyView.vue'),
+      props:{workType:"review"}
     }
   ]
 })

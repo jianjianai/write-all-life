@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
+import test from 'node:test';
 import { type Ref, ref, computed, watchEffect, watch } from 'vue';
+
+const { workType } = defineProps<{
+  workType: "study" | "review"
+}>();
 
 ////当前选择的词库
 const loadNeedStudyArraysError: Ref<any> = ref(undefined);
@@ -56,9 +61,9 @@ const nextStudying = () => {
      * 如果当前单词已经完成背诵，替换成新的任务。
      */
     ok() {
-      theStudy.okTime = theStudy.okTime-1;
+      theStudy.okTime = theStudy.okTime - 1;
       console.log(theStudy);
-      if (theStudy.okTime < 0) {
+      if (theStudy.okTime <= 0) {
         if (needStudyArrays.value!.length > 0) {//如果有新的任务则替换
           let study = needStudyArrays.value!.shift();
           studyingArray.value[index] = new Studying(needStudyTime(study!), study!);
@@ -66,7 +71,7 @@ const nextStudying = () => {
           studyingArray.value.splice(index, 1);
         }
         //添加完成计数
-        studyCount.value = studyCount.value+1;
+        studyCount.value = studyCount.value + 1;
 
         //修改学习进度并保存
         theStudy.study.schedule++;
@@ -87,6 +92,7 @@ const nextStudying = () => {
 }
 
 //学习组件逻辑
+const flishAll = ref(false);
 const studying: Ref<{ study: Studying, ok: () => void, on: () => void } | undefined> = ref(undefined);
 const studyingWord: Ref<WordPrototype | undefined> = ref(undefined);
 watch(studying, () => {
@@ -95,13 +101,23 @@ watch(studying, () => {
     studyingWord.value = o;
   });
 });
+
+
 //加载词库
 const longing = ref(true);
 StudyManager.getStudyingLibrary().then((studying) => {
-  if (!studying) {
-    throw "错误，当前没有使用任何题库！";
+  if (workType == "study") {//学习模式返回需要学习的词库
+    if (!studying) {
+      throw "错误，当前没有使用任何题库！";
+    }
+    return StudyManager.newStudyArray(studying);
+
+  } else if (workType == "review") {//复习模式返回需要复习的词库
+    return StudyManager.needReviewArray(new Date());
+
+  } else {
+    throw "错误,错误的workType:" + studying;
   }
-  return StudyManager.newStudyArray(studying);
 }).then((array) => {
   needStudyArrays.value = array;
 }).then(() => {
@@ -114,29 +130,37 @@ StudyManager.getStudyingLibrary().then((studying) => {
   }
   //初始化学习组件
   studying.value = nextStudying();
+  if (!studying.value) {
+    flishAll.value = true;
+  }
   //结束加载状态
   longing.value = false;
 }).catch((e) => {
   loadNeedStudyArraysError.value = e;
 });
 
+
+//页面学习逻辑
 const watching = ref(false);
 const inputWord = ref("");
 const message = ref("");
-const check = ()=>{
-  if(studyingWord.value?.word!=inputWord.value){
+const check = () => {
+  if (studyingWord.value?.word != inputWord.value) {
     message.value = "error";
     return;
   }
-  if(!watching.value){
+  if (!watching.value) {
     studying.value!.ok();
-  }else{
+  } else {
     studying.value!.on();
   }
   inputWord.value = "";
   message.value = '';
   watching.value = false;
   studying.value = nextStudying();
+  if (!studying.value) {
+    flishAll.value = true;
+  }
 }
 
 
@@ -144,19 +168,21 @@ const check = ()=>{
 </script>
 <template>
   <div class="page">
-    <div v-if="longing">
+    <div v-if="loadNeedStudyArraysError">{{ loadNeedStudyArraysError }}</div>
+    <div v-else-if="longing">
       longing...
     </div>
     <template v-else>
       <div class="hTitle">
-        <p>学习 {{ studyCount }}/{{ needStudyNumber }}</p>
+        <p v-if="workType == 'study'">学习 {{ studyCount }}/{{ needStudyNumber }}</p>
+        <p v-else-if="workType == 'review'">复习 {{ studyCount }}/{{ needStudyNumber }}</p>
+        <p v-else>???</p>
       </div>
 
-      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
-      <div>{{ studyingIndex }}</div>
-      <div style="font-size: 3rem;"> {{ studying }}</div>
-
-      <template v-if="!studyingWord">
+      <template v-if="flishAll">
+        <div>已经全部学习完成！</div>
+      </template>
+      <template v-else-if="!studyingWord">
         <div>loinging...</div>
       </template>
       <!-- 背 -->
@@ -167,7 +193,7 @@ const check = ()=>{
         <p>{{ message }}</p>
         <input type="text" v-model="inputWord">
         <input type="button" value="检查" @click="check">
-        <input type="button" value="不会" @click="watching=true">
+        <input type="button" value="不会" @click="watching = true">
       </template>
       <!-- 看 -->
       <template v-else>
@@ -179,6 +205,15 @@ const check = ()=>{
         <input type="button" value="检查" @click="check">
       </template>
     </template>
+
+    <!-- 调试 -->
+    <div style="border: 1px solid green;">
+      <div>调试信息</div>
+      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+      <div>{{ studyingIndex }}</div>
+      <div style="font-size: 3rem;"> {{ studying }}</div>
+    </div>
+
   </div>
 </template>
   

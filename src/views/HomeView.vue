@@ -44,7 +44,7 @@ StudyManager.getStudyingLibrary().then((studying)=>{
           <p v-if="!needStudyArrays">loinging...</p>
           <p v-else>{{needStudyArrays!.length}}</p>
         </RouterLink>
-        <RouterLink  class="studyButtln" to="/">
+        <RouterLink  class="studyButtln" to="/review">
           <h4>复习</h4>
           <p v-if="!needReviewArray">loinging...</p>
           <p v-else>{{ needReviewArray!.length }}</p>
