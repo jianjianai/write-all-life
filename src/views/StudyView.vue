@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
-import test from 'node:test';
-import { type Ref, ref, computed, watchEffect, watch } from 'vue';
+import { type Ref, ref, watch } from 'vue';
 
 const { workType } = defineProps<{
   workType: "study" | "review"
