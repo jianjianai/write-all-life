@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PinyinText from '@/components/PinyinText.vue';
 import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
 import { type Ref, ref, watch } from 'vue';
 
@@ -145,7 +146,7 @@ const inputWord = ref("");
 const message = ref("");
 const check = () => {
   if (studyingWord.value?.word != inputWord.value) {
-    message.value = "error";
+    message.value = "词语不正确";
     return;
   }
   if (!watching.value) {
@@ -161,6 +162,9 @@ const check = () => {
     flishAll.value = true;
   }
 }
+watch(inputWord, () => {
+  message.value = "";
+})
 
 
 
@@ -181,42 +185,88 @@ const check = () => {
       <template v-if="flishAll">
         <div>已经全部学习完成！</div>
       </template>
+
       <template v-else-if="!studyingWord">
         <div>loinging...</div>
       </template>
-      <!-- 背 -->
-      <template v-else-if="!watching">
-        <div>
-          {{ studyingWord.word }}::
+
+      <div v-else class="studyPage">
+        <div class="pageShwo">
+          <div>
+            <PinyinText :text="`随便一点点的啊${studyingWord.word}随便一点点的啊`" :word="studyingWord.word" :inputWord="inputWord"
+              :shwoWord="watching"></PinyinText>
+          </div>
+          <div>
+            <p class="message">{{ message }}</p>
+          </div>
+          <input type="text" :maxlength="studyingWord.word.length" v-model="inputWord" @keydown.enter="check">
         </div>
-        <p>{{ message }}</p>
-        <input type="text" v-model="inputWord">
-        <input type="button" value="检查" @click="check">
-        <input type="button" value="不会" @click="watching = true">
-      </template>
-      <!-- 看 -->
-      <template v-else>
-        <div>
-          {{ studyingWord.word }}
+
+        <div class="pageButtons">
+          <input type="button" value="检查" @click="check">
+          <input v-if="!watching" type="button" value="不会" @click="watching = true">
         </div>
-        <p>{{ message }}</p>
-        <input type="text" v-model="inputWord">
-        <input type="button" value="检查" @click="check">
-      </template>
+        <!-- 将上面的元素挤到上方的没用div -->
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </template>
+  </div>
 
-    <!-- 调试 -->
-    <div style="border: 1px solid green;">
-      <div>调试信息</div>
-      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
-      <div>{{ studyingIndex }}</div>
-      <div style="font-size: 3rem;"> {{ studying }}</div>
-    </div>
-
+  <!-- 调试 -->
+  <div style="border: 1px solid green;" id="text">
+    <div>调试信息</div>
+    <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+    <div>{{ studyingIndex }}</div>
+    <div style="font-size: 3rem;"> {{ studying }}</div>
   </div>
 </template>
   
 <style scoped>
+#text {
+  opacity: 0.5;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+}
+
+.showWord {
+  font-size: 6rem;
+}
+
+.studyPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.message {
+  font-size: 4rem;
+}
+
+.pageShwo {
+  min-height: 40rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.pageButtons {
+  min-height: 40rem;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
 .page {
   height: 100%;
   position: relative;

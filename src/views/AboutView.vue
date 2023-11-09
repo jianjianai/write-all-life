@@ -1,7 +1,15 @@
 <template>
-  <RouterLink class="link" to="/">返回</RouterLink>
-  <div class="about">
-    <h1>This is an about page</h1>
+  <div class="about" style="font-size: 5rem;">
+    <p>
+      随着电子设备越来越普及，我们拿起纸和笔写字的次数越来越少了。
+      好用的拼音输入让我们可以很方便地输入文字而不用想这个字怎么写。
+      我就是拼音输入法的受益者也是拼音输入法的受害者之一，当我在需要手写一下文件时就常常提笔忘字。
+      随着时间的流逝，我一直被这个问题困扰了很久，于是开发了这个项目。
+    </p>
+    <p><br><br></p>
+    <h1>write-all-life</h1>
+    <p>github</p>
+    <p><a href="https://github.com/jianjianai/write-all-life">https://github.com/jianjianai/write-all-life</a></p>
   </div>
 </template>
 
