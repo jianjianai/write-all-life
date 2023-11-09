@@ -73,7 +73,7 @@ const nextStudying = () => {
         studyCount.value = studyCount.value + 1;
 
         //修改学习进度并保存
-        theStudy.study.schedule++;
+        theStudy.study.setNextlearn();//进行下一次学习
         theStudy.study.update();
       }
       this.ok = () => { throw new Error("不可多次调用！") };
@@ -82,7 +82,7 @@ const nextStudying = () => {
      * 本次没记住,则重新学习
      */
     on() {
-      theStudy.study.schedule = 1;
+      theStudy.study.setRelearn();//重新学习
       theStudy.study.update();
       theStudy.okTime = needStudyTime(theStudy.study);
       this.on = () => { throw new Error("不可多次调用！") };
