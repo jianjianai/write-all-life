@@ -19,6 +19,16 @@ export default class LibraryPrototype implements Library, DBUpdate {
         });
     }
     /**
+     * 删除一个词语
+     */
+    async remove(word: WordPrototype){
+        let del = await DB.library_word.where("wordid").equals(word.id).and((e)=>{return e.libraryid==this.id}).first();
+        if(!del){
+            return;
+        }
+        await DB.library_word.delete(del!.id!);
+    }
+    /**
      * 添加词语到词库
      * @returns addNew:是否添加了新的，word:这个新的对象或者是已经存在的对象
      */

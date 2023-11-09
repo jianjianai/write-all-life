@@ -19,6 +19,14 @@ LibraryManager.get(parseInt(libraryid as string)).then((the)=>{
     error.value = e;
 });
 
+//删除
+const remove = (wordsIndex:number)=>{
+    let word = words.value![wordsIndex];
+    words.value?.splice(wordsIndex,1);
+    library.value!.remove(word);
+}
+
+
 //添加
 const adderror: Ref<any> = ref(undefined);
 const addInput: Ref<string | void> = ref(undefined);
@@ -76,8 +84,9 @@ const addButtonClick = async () => {
                     </div>
                     <template v-else>
                         <div class="wordList">
-                            <div v-for="{ word,id } in words" :key="id" class="wordDiv">
-                                {{ word }}
+                            <div v-for="theWord,index in words" :key="theWord.id" class="wordDiv">
+                                <div class="woedShow">{{ theWord.word }}</div>
+                                <div class="delWord" @click.stop="remove(index)">×</div>
                             </div>
                         </div>
                     </template>
@@ -118,7 +127,20 @@ const addButtonClick = async () => {
     min-width: 12rem;
     padding: 1rem;
     margin: 1rem;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+.woedShow{
     font-size: 3rem;
+}
+.delWord{
+    font-size: 3rem;
+    color: red;
+    cursor: pointer;
 }
 
 .body {
