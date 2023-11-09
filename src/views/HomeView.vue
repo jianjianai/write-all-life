@@ -1,25 +1,15 @@
 <script setup lang="ts">
-import { type LibraryPrototype, StudyManager, type StudyPrototype } from '@/db';
-import { type Ref, ref } from 'vue';
+import { useStudyStore } from '@/stores/StudyStore';
+import { toRefs } from 'vue';
 
-//当前选择的词库
-const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
-const studyingLibraryloinging = ref(true);
-const needStudyArrays:Ref<StudyPrototype[]|undefined> = ref(undefined);
-const needReviewArray:Ref<StudyPrototype[]|undefined> = ref(undefined);
-StudyManager.getStudyingLibrary().then((studying)=>{
-  studyingLibrary.value = studying;
-  studyingLibraryloinging.value = false;
-  if(!studying){
-    return;
-  }
-  StudyManager.newStudyArray(studying).then((array)=>{
-    needStudyArrays.value  = array;
-  });
-  StudyManager.needReviewArray(new Date()).then((array)=>{
-    needReviewArray.value = array;
-  });
-});
+const {
+    studyingLibrary,
+    studyingLibraryloinging,
+    needStudyArrays,
+    needStudyArraysloinging,
+    needReviewArray,
+    needReviewArrayloinging
+  } = toRefs(useStudyStore());
 
 </script>
 
@@ -41,12 +31,12 @@ StudyManager.getStudyingLibrary().then((studying)=>{
       <template v-else>
         <RouterLink class="studyButtln" to="/study">
           <h4>学习</h4>
-          <p v-if="!needStudyArrays">loinging...</p>
+          <p v-if="needStudyArraysloinging">loinging...</p>
           <p v-else>{{needStudyArrays!.length}}</p>
         </RouterLink>
         <RouterLink  class="studyButtln" to="/review">
           <h4>复习</h4>
-          <p v-if="!needReviewArray">loinging...</p>
+          <p v-if="needReviewArrayloinging">loinging...</p>
           <p v-else>{{ needReviewArray!.length }}</p>
         </RouterLink>
       </template>

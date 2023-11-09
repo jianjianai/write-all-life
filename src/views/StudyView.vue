@@ -1,18 +1,29 @@
 <script setup lang="ts">
 import PinyinText from '@/components/PinyinText.vue';
 import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
-import { type Ref, ref, watch } from 'vue';
+import { useStudyStore } from '@/stores/StudyStore';
+import { type Ref, ref, watch, toRefs, onUnmounted } from 'vue';
 
 const { workType } = defineProps<{
   workType: "study" | "review"
 }>();
 
-////当前选择的词库
-const loadNeedStudyArraysError: Ref<any> = ref(undefined);
-const needStudyArrays: Ref<StudyPrototype[] | undefined> = ref(undefined);
+const {
+  studyingLibrary,
+  studyingLibraryloinging,
+  needStudyArrays,
+  needStudyArraysloinging,
+  needReviewArray,
+  needReviewArrayloinging
+} = toRefs(useStudyStore());
 
+
+
+////当前选择的词库
+let studyAllArrays: Ref<StudyPrototype[] | undefined> | undefined = undefined;
 ////学习功能
 const studyingArray: Ref<Studying[]> = ref([]);
+
 const studyingIndex = ref(0);
 class Studying {
   //需要的记住次数，降到0则代表学习完成
@@ -64,8 +75,8 @@ const nextStudying = () => {
       theStudy.okTime = theStudy.okTime - 1;
       console.log(theStudy);
       if (theStudy.okTime <= 0) {
-        if (needStudyArrays.value!.length > 0) {//如果有新的任务则替换
-          let study = needStudyArrays.value!.shift();
+        if (studyAllArrays!.value!.length > 0) {//如果有新的任务则替换
+          let study = studyAllArrays!.value!.shift();
           studyingArray.value[index] = new Studying(needStudyTime(study!), study!);
         } else {
           studyingArray.value.splice(index, 1);
@@ -102,30 +113,23 @@ watch(studying, () => {
   });
 });
 
+//没学完的要还回去
+onUnmounted(() => {
+  if (studyAllArrays) {
+    for (const stud of studyingArray.value) {
+      studyAllArrays.value!.unshift(stud.study);
+    }
+  }
+})
 
 //加载词库
 const longing = ref(true);
-StudyManager.getStudyingLibrary().then((studying) => {
-  if (workType == "study") {//学习模式返回需要学习的词库
-    if (!studying) {
-      throw "错误，当前没有使用任何题库！";
-    }
-    return StudyManager.newStudyArray(studying);
-
-  } else if (workType == "review") {//复习模式返回需要复习的词库
-    return StudyManager.needReviewArray(new Date());
-
-  } else {
-    throw "错误,错误的workType:" + studying;
-  }
-}).then((array) => {
-  needStudyArrays.value = array;
-}).then(() => {
+const loadStudyingArray = () => {
   //需要学习的个数
-  needStudyNumber.value = Math.min(10, needStudyArrays.value!.length);
+  needStudyNumber.value = Math.min(10, studyAllArrays!.value!.length);
   //讲即将学习的词添加到学习队列
-  for (let i = 0; i < needStudyNumber.value && needStudyArrays.value!.length > 0; i++) {
-    let study = needStudyArrays.value!.shift();
+  for (let i = 0; i < needStudyNumber.value && studyAllArrays!.value!.length > 0; i++) {
+    let study = studyAllArrays!.value!.shift();
     studyingArray.value.push(new Studying(needStudyTime(study!), study!));
   }
   //初始化学习组件
@@ -135,9 +139,65 @@ StudyManager.getStudyingLibrary().then((studying) => {
   }
   //结束加载状态
   longing.value = false;
-}).catch((e) => {
-  loadNeedStudyArraysError.value = e;
-});
+}
+
+
+
+//开始加载组件
+const loadNeedStudyArraysError: Ref<any> = ref(undefined);
+if (workType == "study") {
+  watch(needStudyArraysloinging, () => {
+    if (needStudyArraysloinging.value) {
+      return;
+    }
+    studyAllArrays = needStudyArrays;
+    loadStudyingArray();
+  }, { immediate: true })
+} else if (workType == "review") {
+  watch(needReviewArrayloinging, () => {
+    if (needReviewArrayloinging.value) {
+      return;
+    }
+    studyAllArrays = needReviewArray;
+    loadStudyingArray();
+  }, { immediate: true })
+} else {
+  loadNeedStudyArraysError.value = "错误,错误的workType:" + studying;
+}
+
+// StudyManager.getStudyingLibrary().then((studying) => {
+//   if (workType == "study") {//学习模式返回需要学习的词库
+//     if (!studying) {
+//       throw "错误，当前没有使用任何题库！";
+//     }
+//     return StudyManager.newStudyArray(studying);
+
+//   } else if (workType == "review") {//复习模式返回需要复习的词库
+//     return StudyManager.needReviewArray(new Date());
+
+//   } else {
+//     throw "错误,错误的workType:" + studying;
+//   }
+// }).then((array) => {
+//   studyAllArrays.value = array;
+// }).then(() => {
+//   //需要学习的个数
+//   needStudyNumber.value = Math.min(10, studyAllArrays.value!.length);
+//   //讲即将学习的词添加到学习队列
+//   for (let i = 0; i < needStudyNumber.value && studyAllArrays.value!.length > 0; i++) {
+//     let study = studyAllArrays.value!.shift();
+//     studyingArray.value.push(new Studying(needStudyTime(study!), study!));
+//   }
+//   //初始化学习组件
+//   studying.value = nextStudying();
+//   if (!studying.value) {
+//     flishAll.value = true;
+//   }
+//   //结束加载状态
+//   longing.value = false;
+// }).catch((e) => {
+//   loadNeedStudyArraysError.value = e;
+// });
 
 
 //页面学习逻辑
@@ -186,20 +246,21 @@ watch(inputWord, () => {
         <div>已经全部学习完成！</div>
       </template>
 
-      <template v-else-if="!studyingWord">
-        <div>loinging...</div>
-      </template>
-
       <div v-else class="studyPage">
         <div class="pageShwo">
           <div>
-            <PinyinText :text="`随便一点点的啊${studyingWord.word}随便一点点的啊`" :word="studyingWord.word" :inputWord="inputWord"
-              :shwoWord="watching"></PinyinText>
+            <template v-if="!studyingWord">
+              <p>loinging...</p>
+            </template>
+            <template v-else>
+              <PinyinText :text="`随便一点点的啊${studyingWord.word}随便一点点的啊`" :word="studyingWord.word" :inputWord="inputWord"
+                :shwoWord="watching"></PinyinText>
+            </template>
           </div>
           <div>
             <p class="message">{{ message }}</p>
           </div>
-          <input type="text" :maxlength="studyingWord.word.length" v-model="inputWord" @keydown.enter="check">
+          <input type="text" :maxlength="studyingWord?studyingWord.word.length:1" v-model="inputWord" @keydown.enter="check">
         </div>
 
         <div class="pageButtons">
@@ -229,6 +290,7 @@ watch(inputWord, () => {
   position: fixed;
   bottom: 0;
   left: 0;
+  z-index: -1;
 }
 
 .showWord {

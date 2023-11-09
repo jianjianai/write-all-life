@@ -37,10 +37,10 @@ export class WordsDatabase extends Dexie {
 
     public constructor() {
         super("WordsDatabase");
-        this.version(1).stores({
+        this.version(2).stores({
             words: "++id,word",
             sentence: "++id,sentence",
-            stuby: "++id,wordid,schedule,next",
+            stuby: "++id,wordid,schedule,next,[wordid+schedule]",
             library: "++id,name",
             library_word: "++id,libraryid,wordid,[libraryid+wordid]"
         });

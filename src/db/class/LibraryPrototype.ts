@@ -63,15 +63,13 @@ export default class LibraryPrototype implements Library, DBUpdate {
      */
     async wordArray(): Promise<Array<WordPrototype>> {
         let library_wordObjArray = await DB.library_word.where("libraryid").equals(this.id!).toArray();
-        let words: Array<WordPrototype> = new Array();
-        for (const library_wordObj of library_wordObjArray) {
-            let word = await DB.words.get(library_wordObj.wordid);
-            if (word) {
-                Object.setPrototypeOf(word, WordPrototype.prototype);
-                let wordPrototype: WordPrototype = word as WordPrototype;
-                words.push(wordPrototype);
+        let wordidArray = library_wordObjArray.map((the)=>{return the.wordid});
+        let WordObjArray = await DB.words.where("id").anyOf(wordidArray).toArray();
+        for (const wordPromis of WordObjArray) {
+            if (wordPromis) {
+                Object.setPrototypeOf(wordPromis, WordPrototype.prototype);
             }
         }
-        return words;
+        return WordObjArray as WordPrototype[];
     }
 }

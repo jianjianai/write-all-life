@@ -25,24 +25,43 @@ export default {
     },
     //获取指定词库还没学习的新进度
     async newStudyArray(library: LibraryPrototype) {
-        let wordPromiseArray = (await library.wordArray()).map((word) => { return this.getByWord(word); });
+        let library_wordObjArray = await DB.library_word.where("libraryid").equals(library.id!).toArray();
+        let wordObjIdArray = library_wordObjArray.map((the) => { return the.wordid });
+
+        //表里有记录的
+        let wordObjArray = await DB.stuby.where("wordid").anyOf(wordObjIdArray).toArray();
+        //表里没记录的ID
+        let wordIdNewArray = wordObjIdArray.filter(wordid => {
+            return wordObjArray.every(wordObj => {
+                return wordObj.wordid != wordid
+            })
+        })
         let wordArray: StudyPrototype[] = [];
-        for (const p of wordPromiseArray) {
-            wordArray.push(await p);
+        for (const wordObj of wordObjArray) {
+            if(wordObj.schedule>1){
+                continue;
+            }
+            Object.setPrototypeOf(wordObj, StudyPrototype.prototype);
+            wordArray.push(wordObj as StudyPrototype)
         }
-        return wordArray.filter((word) => { return (!word.id || word.schedule<=1); });
+        for(const id of wordIdNewArray){
+            const theObj = { wordid: id, schedule: 1, next: 0 };
+            Object.setPrototypeOf(theObj, StudyPrototype.prototype);
+            wordArray.push(theObj as StudyPrototype)
+        }
+        return wordArray;
     },
     //设置用户正在学习的词库
-    async setStudyingLibrary(library: LibraryPrototype){
-        localStorage.setItem("StudyingLibrary",library.id.toString());
+    async setStudyingLibrary(library: LibraryPrototype) {
+        localStorage.setItem("StudyingLibrary", library.id.toString());
     },
     /** 
      * 获取用户正在学习的词库
      * @returns null 用户没有正在学习的词库
     */
-    async getStudyingLibrary():Promise<LibraryPrototype|null|undefined>{
+    async getStudyingLibrary(): Promise<LibraryPrototype | null | undefined> {
         let studying = localStorage.getItem("StudyingLibrary");
-        if(!studying){
+        if (!studying) {
             return undefined;
         }
         return await LibraryManager.get(Number(studying));
