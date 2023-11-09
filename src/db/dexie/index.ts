@@ -42,7 +42,7 @@ export class WordsDatabase extends Dexie {
             sentence: "++id,sentence",
             stuby: "++id,wordid,schedule,next",
             library: "++id,name",
-            library_word: "++id,libraryid,wordid"
+            library_word: "++id,libraryid,wordid,[libraryid+wordid]"
         });
     }
 }

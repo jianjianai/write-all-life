@@ -22,7 +22,7 @@ export default class LibraryPrototype implements Library, DBUpdate {
      * 删除一个词语
      */
     async remove(word: WordPrototype){
-        let del = await DB.library_word.where("wordid").equals(word.id).and((e)=>{return e.libraryid==this.id}).first();
+        let del = await DB.library_word.where("[libraryid+wordid]").equals([this.id,word.id]).first();
         if(!del){
             return;
         }
@@ -45,7 +45,7 @@ export default class LibraryPrototype implements Library, DBUpdate {
 
 
         //添加对应表
-        let qurt2 = DB.library_word.where("wordid").equals(wordObj!.id!).and((obj) => { return obj.libraryid == this.id; });
+        let qurt2 = DB.library_word.where("[libraryid+wordid]").equals([this.id,wordObj!.id!]);
         let library_wordObj: Library_Word | undefined = await qurt2.first();
         if (!library_wordObj) {
             let addobj = { libraryid: this.id!, wordid: wordObj.id! };
