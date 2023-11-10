@@ -59,7 +59,7 @@ watch([shwoWord,inputWord],()=>{xxxxxsssss()},{ immediate: false });
     <p class="pinyinP">
     <div v-for="{ t, up , is_ } of shwoArray" :class="{aChar:true,mChar:is_}">
         <div class="top">{{ up }}</div>
-        <div :class="{char:true,_char:is_}" >{{ t }}</div>
+        <div :class="{char:true,_char:is_,__char:!t}" >{{ t?t:"■" }}</div>
     </div>
     </p>
 </template>
@@ -79,21 +79,27 @@ watch([shwoWord,inputWord],()=>{xxxxxsssss()},{ immediate: false });
     margin-right: 0.3rem;
 }
 .top{
-    height: 4rem;
-    font-size: 4rem;
+    /* height: 4rem; */
+    font-size: 3rem;
+    line-height: 4rem;
     text-align: center;
 }
 .char{
     font-size: 4rem;
-    min-height: 3rem;
-    min-width: 3rem;
+    line-height: 4rem;
+    /* min-height: 3rem;
+    min-width: 3rem; */
     text-align: center;
     padding-bottom: 0.2rem;
 }
 ._char{
-    font-size: 5rem;
+    font-weight: bolder;
+    /* font-size: 5em; */
     border-bottom: 0.2rem solid black;
-    min-height: 8rem;
-    min-width: 8rem;
+    /* min-height: 8rem;
+    min-width: 8rem; */
+}
+.__char{
+    color: rgba(255, 255, 255, 0);
 }
 </style>

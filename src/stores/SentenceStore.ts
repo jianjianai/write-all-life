@@ -12,10 +12,9 @@ export const useSentenceStore = defineStore('sentence', () => {
   const reLoadSentenceFuse = async () => {
     const datas = await SentenceManager.sentenceArray();
     sentenceFuse.value = new Fuse(datas, {
-      keys: ["sentence"],
-      includeScore:true,
-      threshold:0.4999
+      keys: ["sentence"]
     });
+    sentenceFuseloinging.value = false;
   };
   reLoadSentenceFuse();
   return {

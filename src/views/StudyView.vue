@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import PinyinText from '@/components/PinyinText.vue';
 import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
+import type { SentencePrototype } from '@/db/class';
+import { useSentenceStore } from '@/stores/SentenceStore';
 import { useStudyStore } from '@/stores/StudyStore';
-import { type Ref, ref, watch, toRefs, onUnmounted } from 'vue';
+import { type Ref, ref, watch, toRefs, onUnmounted, computed } from 'vue';
 
 const { workType } = defineProps<{
   workType: "study" | "review"
@@ -16,6 +18,11 @@ const {
   needReviewArray,
   needReviewArrayloinging
 } = toRefs(useStudyStore());
+
+const {
+  sentenceFuseloinging,
+  sentenceFuse
+} = toRefs(useSentenceStore());
 
 
 
@@ -106,6 +113,24 @@ const nextStudying = () => {
 const flishAll = ref(false);
 const studying: Ref<{ study: Studying, ok: () => void, on: () => void } | undefined> = ref(undefined);
 const studyingWord: Ref<WordPrototype | undefined> = ref(undefined);
+const studyingSenence = computed(() => {
+  //查找句子
+  if (sentenceFuseloinging.value) {
+    return undefined;
+  }
+  if (!studyingWord.value) {
+    return undefined;
+  }
+  let sentenceArray = sentenceFuse.value!.search(studyingWord.value.word);
+  while (sentenceArray.length > 0) {
+    let index = Math.floor(sentenceArray.length * Math.random());
+    let sentence = sentenceArray[index].item;
+    sentenceArray.splice(index, 1);
+    if (sentence.sentence.indexOf(studyingWord.value.word) >= 0) {
+      return sentence;
+    }
+  }
+});
 watch(studying, () => {
   studyingWord.value = undefined;
   studying.value?.study.study.getWord().then((o) => {
@@ -248,19 +273,31 @@ watch(inputWord, () => {
 
       <div v-else class="studyPage">
         <div class="pageShwo">
-          <div>
-            <template v-if="!studyingWord">
+
+          <template v-if="!studyingWord">
+            <div>
               <p>loinging...</p>
-            </template>
-            <template v-else>
-              <PinyinText :text="`随便一点点的啊${studyingWord.word}随便一点点的啊`" :word="studyingWord.word" :inputWord="inputWord"
-                :shwoWord="watching"></PinyinText>
-            </template>
-          </div>
+            </div>
+
+          </template>
+          <template v-else>
+            <div class="mainShsow">
+              <PinyinText class="mainShsowP" :text="studyingWord.word" :word="studyingWord.word" :inputWord="inputWord"
+                :shwoWord="watching" />
+            </div>
+            <div class="cShsowDiv">
+              <p v-if="sentenceFuseloinging" style="font-size: 3rem;">loinging..</p>
+              <p v-else-if="!studyingSenence" style="font-size: 3rem;">没找到包含此词语的句子</p>
+              <PinyinText v-else class="cShsow" :text="studyingSenence.sentence" :word="studyingWord.word"
+                :inputWord="inputWord" :shwoWord="watching" />
+            </div>
+          </template>
+
           <div>
             <p class="message">{{ message }}</p>
           </div>
-          <input type="text" :maxlength="studyingWord?studyingWord.word.length:1" v-model="inputWord" @keydown.enter="check">
+          <input type="text" :maxlength="studyingWord ? studyingWord.word.length : 1" v-model="inputWord"
+            @keydown.enter="check">
         </div>
 
         <div class="pageButtons">
@@ -276,12 +313,12 @@ watch(inputWord, () => {
   </div>
 
   <!-- 调试 -->
-  <div style="border: 1px solid green;" id="text">
+  <!-- <div style="border: 1px solid green;" id="text">
     <div>调试信息</div>
     <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
     <div>{{ studyingIndex }}</div>
     <div style="font-size: 3rem;"> {{ studying }}</div>
-  </div>
+  </div> -->
 </template>
   
 <style scoped>
@@ -292,6 +329,25 @@ watch(inputWord, () => {
   left: 0;
   z-index: -1;
 }
+
+.mainShsow {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 20rem;
+  align-items: center;
+}
+
+.mainShsowP {
+  transform: scale(2);
+}
+
+.cShsowDiv {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.cShsow {}
 
 .showWord {
   font-size: 6rem;
@@ -311,7 +367,7 @@ watch(inputWord, () => {
 }
 
 .pageShwo {
-  min-height: 40rem;
+  min-height: 65rem;
   text-align: center;
   display: flex;
   flex-direction: column;
