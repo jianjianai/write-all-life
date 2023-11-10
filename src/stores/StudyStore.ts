@@ -14,7 +14,7 @@ export const useStudyStore = defineStore('study', () => {
   const needReviewArrayloinging = ref(true);
   StudyManager.needReviewArray(new Date()).then((array) => {
     needReviewArray.value = array;
-    needReviewArrayloinging.value =false;
+    needReviewArrayloinging.value = false;
   });
   StudyManager.getStudyingLibrary().then((studying) => {
     studyingLibrary.value = studying;
@@ -37,3 +37,6 @@ export const useStudyStore = defineStore('study', () => {
     needReviewArrayloinging
   }
 })
+
+
+

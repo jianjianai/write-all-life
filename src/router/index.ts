@@ -24,6 +24,9 @@ const router = createRouter({
       path:"/review",name:"StudyView-review",
       component:()=> import('@/views/StudyView.vue'),
       props:{workType:"review"}
+    },{ 
+      path: '/sentence/:pageOf([0-9]+)',name:"SentenceView", 
+      component: () => import('@/views/SentenceView.vue') 
     }
   ]
 })

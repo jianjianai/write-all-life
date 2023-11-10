@@ -22,11 +22,7 @@ export default class LibraryPrototype implements Library, DBUpdate {
      * 删除一个词语
      */
     async remove(word: WordPrototype){
-        let del = await DB.library_word.where("[libraryid+wordid]").equals([this.id,word.id]).first();
-        if(!del){
-            return;
-        }
-        await DB.library_word.delete(del!.id!);
+        await DB.library_word.where("[libraryid+wordid]").equals([this.id,word.id]).delete();
     }
     /**
      * 添加词语到词库

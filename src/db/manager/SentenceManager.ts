@@ -6,14 +6,16 @@ export default {
     /**
      * 添加句子
      */
-    async add(text:string):Promise<SentencePrototype>{
+    async add(text:string):Promise<{addNew:boolean,sentence:SentencePrototype}>{
         let theObj = await DB.sentence.where("sentence").equals(text).first();
+        let isAdded = false;
         if(!theObj){
             let id = await DB.sentence.add({sentence:text});
             theObj = {id:id,sentence:text};
+            isAdded = true;
         }
         Object.setPrototypeOf(theObj,SentencePrototype.prototype)
-        return theObj as SentencePrototype;
+        return {addNew:isAdded,sentence:theObj as SentencePrototype};
     },
     /**
      * 获取句子
@@ -42,5 +44,11 @@ export default {
             Object.setPrototypeOf(obj,SentencePrototype.prototype);
         }
         return objArray as SentencePrototype[];
+    },
+    /**
+     * 全部句子的数量
+     */
+    async count(){
+        return await DB.sentence.count();
     }
 }

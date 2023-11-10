@@ -9,4 +9,8 @@ export default class SentencePrototype implements Sentence,DBUpdate{
         await DB.sentence.put({id:this.id,sentence:this.sentence});
     }
 
+    async remove(){
+        await DB.sentence.delete(this.id);
+    }
+
 }

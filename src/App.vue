@@ -2,13 +2,16 @@
 import { RouterLink, RouterView } from 'vue-router'
 import {DB} from './db/dexie';
 import { onBeforeMount, onBeforeUnmount, onMounted, reactive, watch, watchEffect } from 'vue';
-import { LibraryManager, StudyManager } from './db';
+import { LibraryManager, SentenceManager, StudyManager } from './db';
+import { useSentenceStore } from './stores/SentenceStore';
 let html = document.querySelector("html");
 let body = document.querySelector("body");
 onMounted(() => {
   window.DB = DB;
   window.LibraryManager = LibraryManager;
   window.StudyManager = StudyManager;
+  window.SentenceManager = SentenceManager;
+  window.useSentenceStore = useSentenceStore;
 });
 let appsize = reactive({
   width: 0,
