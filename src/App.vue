@@ -63,5 +63,3 @@ watchEffect(() => {
 }
 
 </style>
-import { LibraryManager } from "./db/LibraryManager";
-./db/manager
