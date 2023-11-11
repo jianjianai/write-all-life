@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import { LibraryManager, StudyManager, type LibraryPrototype } from '@/db';
-import { ref, type Ref } from 'vue';
+import { useStudyStore } from '@/stores/StudyStore';
+import { ref, toRefs, type Ref } from 'vue';
+
+const {
+    studyingLibrary,
+    studyingLibraryloinging,
+    needStudyArrays,
+    needStudyArraysloinging,
+    needReviewArray,
+    needReviewArrayloinging
+  } = toRefs(useStudyStore());
 
 //显示题库列表
 const libraryArray: Ref<LibraryPrototype[] | undefined> = ref(undefined);
@@ -9,8 +19,6 @@ LibraryManager.array().then((the)=>{
 });
 
 //当前选择的词库
-const studyingLibrary: Ref<LibraryPrototype | undefined | null> = ref(undefined);
-const studyingLibraryloinging = ref(true);
 StudyManager.getStudyingLibrary().then((the)=>{
     studyingLibrary.value = the;
     studyingLibraryloinging.value = false;

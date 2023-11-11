@@ -21,8 +21,15 @@ export default class LibraryPrototype implements Library, DBUpdate {
     /**
      * 删除一个词语
      */
-    async remove(word: WordPrototype){
+    async removeWord(word: WordPrototype){
         await DB.library_word.where("[libraryid+wordid]").equals([this.id,word.id]).delete();
+    }
+    /**
+     * 删除词库
+     */
+    async remove(){
+        await DB.library_word.where("libraryid").equals(this.id).delete();
+        await DB.library.delete(this.id);
     }
     /**
      * 添加词语到词库

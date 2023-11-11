@@ -1,4 +1,4 @@
-import { ref, computed, type Ref } from 'vue'
+import { ref, computed, type Ref,watch } from 'vue'
 import { defineStore } from 'pinia'
 import { StudyManager, type LibraryPrototype, type StudyPrototype } from '@/db';
 
@@ -16,16 +16,22 @@ export const useStudyStore = defineStore('study', () => {
     needReviewArray.value = array;
     needReviewArrayloinging.value = false;
   });
+  watch(studyingLibrary,()=>{
+    needStudyArraysloinging.value =  true;
+    if(studyingLibrary.value==null){
+      return;
+    }
+    StudyManager.newStudyArray(studyingLibrary.value).then((array) => {
+      needStudyArrays.value = array;
+      needStudyArraysloinging.value = false;
+    });
+  })
   StudyManager.getStudyingLibrary().then((studying) => {
     studyingLibrary.value = studying;
     studyingLibraryloinging.value = false;
     if (!studying) {
       return;
     }
-    StudyManager.newStudyArray(studying).then((array) => {
-      needStudyArrays.value = array;
-      needStudyArraysloinging.value = false;
-    });
   });
 
   return {

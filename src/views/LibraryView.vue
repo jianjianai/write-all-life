@@ -3,6 +3,7 @@ import { LibraryManager } from '@/db/manager/index.js';
 import { ref, type Ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { type LibraryPrototype, type WordPrototype } from "@/db"
+import router from '@/router';
 
 //显示
 const route = useRoute();
@@ -23,7 +24,7 @@ LibraryManager.get(parseInt(libraryid as string)).then((the)=>{
 const remove = (wordsIndex:number)=>{
     let word = words.value![wordsIndex];
     words.value?.splice(wordsIndex,1);
-    library.value!.remove(word);
+    library.value!.removeWord(word);
 }
 
 
@@ -49,6 +50,26 @@ const addButtonClick = async () => {
     adderror.value = null;
 }
 
+//删除
+const removeIng = ref(false);
+const clickRemoove = async ()=>{
+    removeIng.value = true;
+    await library.value!.remove();
+    router.push({name:"LibrarysView"});
+}
+
+//重命名
+const editName = ref(false);
+const editAbout =ref(false);
+const saveEditName = ()=>{
+    editName.value = false;
+    library.value!.update()
+}
+const saveEditAbout = ()=>{
+    editAbout.value =false;
+    library.value!.update()
+}
+
 
 
 </script>
@@ -71,11 +92,22 @@ const addButtonClick = async () => {
             <template v-else>
                 <div class="box">
                     <div class="title">名称</div>
-                    <div class="text">{{ library.name }}</div>
+                    <div v-if="!editName" class="text">{{ library.name }}</div>
+                    <input v-else type="text" class="text" v-model="library.name">
+                    <button v-if="!editName" @click="editName=true">编辑</button>
+                    <button v-else @click="saveEditName">保存</button>
                 </div>
                 <div class="box">
                     <div class="title">简介</div>
-                    <div class="text">{{ library.about }}</div>
+                    <div v-if="!editAbout" class="text">{{ library.about }}</div>
+                    <input v-else type="text" class="text" v-model="library.about">
+                    <button v-if="!editAbout" @click="editAbout=true">编辑</button>
+                    <button v-else @click="saveEditAbout">保存</button>
+                </div>
+                <div class="box">
+                    <div class="title">删除词库</div>
+                    <button v-if="!removeIng" @click="clickRemoove">删除</button>
+                    <button v-else disabled>删除中..</button>
                 </div>
                 <div class="box">
                     <div class="title">词语列表</div>
@@ -183,5 +215,6 @@ const addButtonClick = async () => {
 
 .box>.text {
     font-size: 4rem;
+    display: block;
 }
 </style>
