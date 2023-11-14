@@ -1,5 +1,5 @@
 name: deploy github pages
-run-name: ${{ github.actor }} 开始构建并部署到 github page 🚀
+run-name: ${{ github.actor }} -> 构建并部署到 github page 🚀
 
 on:
   push:
