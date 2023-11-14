@@ -59,10 +59,11 @@ watchEffect(() => {
   width: v-bind("`${appsize.width}px`");
   height: v-bind("`${appsize.height}px`");
   border: 1px solid black;
-  position: absolute;
-  left: 50%;
+  position: relative;
+  /* left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
+  /* margin: auto; */
   overflow: hidden;
   font-size: 5rem;
 }
