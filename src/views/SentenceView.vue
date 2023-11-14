@@ -3,7 +3,7 @@ import Pagination from '@/components/Pagination.vue';
 import { SentenceManager } from '@/db';
 import type { SentencePrototype } from '@/db/class';
 import router from '@/router';
-import { ref, watch, type Ref } from 'vue';
+import { ref, watch, type Ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 
@@ -37,7 +37,7 @@ const remove = (index: number) => {
 //添加句子
 const errorMseeage = ref('');
 const addInput = ref('');
-watch(addInput,()=>{
+watch(addInput, () => {
     errorMseeage.value = '';
 })
 const clickAddButtin = async () => {
@@ -45,8 +45,8 @@ const clickAddButtin = async () => {
         errorMseeage.value = "句子为空"
         return;
     }
-    SentenceManager.add(addInput.value).then(({addNew,sentence})=>{
-        if(!addNew){
+    SentenceManager.add(addInput.value).then(({ addNew, sentence }) => {
+        if (!addNew) {
             errorMseeage.value = "句子已存在"
             return;
         }
@@ -55,6 +55,82 @@ const clickAddButtin = async () => {
     });
 }
 
+//批量导入
+const fen = (bigString:string)=>{
+    bigString = bigString.replace(/\n\n+/g,"\n");
+    if (bigString.startsWith("\n")) {
+        bigString = bigString.substring(1);
+    }
+    if (bigString.endsWith("\n")) {
+        bigString = bigString.substring(0, bigString.length - 1);
+    }
+    const sentences = bigString.split("\n");
+    if(sentences.length==1 && !sentences[0]){
+        return [];
+    }
+    return sentences;
+}
+const inputText = ref('');
+const inputMessage = ref('');
+watch(inputText,()=>{
+    inputMessage.value =  `共${fen(inputText.value).length}个句子。`
+});
+const inputClick = async ()=>{
+    const sentences = fen(inputText.value);
+    let lastTime = 0;
+    let countOk = 0;
+    let countHas = 0;
+    let addArray = [];
+    for(let index=0;index<sentences.length;index++){
+        let now = Date.now();
+        if(lastTime<now){
+            inputMessage.value = `正在添加.. 剩${sentences.length - index}个句子。成功${countOk}个，${countHas}个重复`
+            lastTime = now+500;
+        }
+        let value = sentences[index];
+        const {addNew,sentence} =  await SentenceManager.add(value);
+        if (!addNew) {
+            countHas++;
+            continue
+        }
+        countOk++;
+        addArray.push(sentence);
+    }
+    inputMessage.value = `添加完成！成功${countOk}个，${countHas}个重复`
+    sentenceArray.value = [...sentenceArray.value!,...addArray];
+    theWitallSentenceArray.value = undefined;
+}
+
+//导出
+const outputText = ref('');
+const theWitallSentenceArray:Ref<SentencePrototype[] | undefined> = ref(undefined);
+const allSentenceArray = computed(()=>{
+    if(!theWitallSentenceArray.value){
+        SentenceManager.sentenceArray().then((array)=>{
+            theWitallSentenceArray.value = array;
+        });
+        return undefined;
+    }else{
+        return theWitallSentenceArray.value;
+    }
+});
+const outputMessage = computed(()=>{
+    if (!allSentenceArray.value) {
+        return "正在加载..";
+    }
+    return `共${allSentenceArray.value.length}个句子。`
+});
+const outputClick = ()=>{
+    if (!allSentenceArray.value) {
+        return;
+    }
+    let bigString = '';
+    for(let index=0;index<allSentenceArray.value.length;index++){
+        const value = allSentenceArray.value[index];
+        bigString += value.sentence+"\n";
+    }
+    outputText.value = bigString;
+}
 
 </script>
 <template>
@@ -65,11 +141,30 @@ const clickAddButtin = async () => {
         </div>
         <div class="body">
             <div v-if="pageNumber == Math.ceil(total / pagesize)" class="addDiv">
-                <p>{{ errorMseeage }}</p>
-                <p>
-                    <input type="text" v-model="addInput" @keyup.enter="clickAddButtin">
-                    <input type="button" value="添加" @click="clickAddButtin">
-                </p>
+                <div class="addBody">
+                    <p>{{ errorMseeage }}</p>
+                    <p>
+                        <input type="text" v-model="addInput" @keyup.enter="clickAddButtin">
+                        <input type="button" value="添加" @click="clickAddButtin">
+                    </p>
+                </div>
+                <div class="addBody">
+                    <p class="addBodyTitle">批量导入</p>
+                    <p>
+                        <p>{{ inputMessage }}</p>
+                        <input type="button" value="导入" @click="inputClick">
+                        <textarea class="inputTextarea" v-model="inputText"></textarea>
+                    </p>
+                </div>
+                <div class="addBody">
+                    <p class="addBodyTitle">批量导出</p>
+                    <p>
+                        <p>{{ outputMessage }}</p>
+                        <input type="button" value="导出" @click="outputClick">
+                        <textarea class="outputTextarea" v-model="outputText"></textarea>
+                    </p>
+                </div>
+
             </div>
             <div>
                 <Pagination :page='pageNumber' @change-page='pageNumber = $event' :pagesize='pagesize' :total='total' />
@@ -91,6 +186,12 @@ const clickAddButtin = async () => {
 </template>
   
 <style scoped>
+.inputTextarea,
+.outputTextarea {
+    width: 100%;
+    height: 20rem;
+}
+
 .addDiv {
     text-align: center;
 }
@@ -149,5 +250,6 @@ const clickAddButtin = async () => {
     margin: 2rem;
     margin-top: 0;
     margin-bottom: 0;
-}</style>
+}
+</style>
   

@@ -90,7 +90,7 @@ const bigInput = ref('');
 const bigInputShow = ref('');
 watch(bigInput, () => {
     bigInputShow.value = `共${fenci(bigInput.value).length}个词语。`
-}, { immediate: true })
+})
 const bigInputClick = async () => {
     if (!library.value) {
         bigInputShow.value = "请等待加载完成"
