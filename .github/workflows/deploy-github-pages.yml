@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: build - 构建
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout - 迁出文件
         uses: actions/checkout@v4.1.1
