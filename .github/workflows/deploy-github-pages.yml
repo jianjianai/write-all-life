@@ -1,5 +1,9 @@
 name: deploy github pages
 run-name: ${{ github.actor }} 开始构建并部署到 github page 🚀
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 on:
   push:
     # branches:
