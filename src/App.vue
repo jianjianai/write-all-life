@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import {DB} from './db/dexie';
-import { onBeforeMount, onBeforeUnmount, onMounted, reactive, watch, watchEffect } from 'vue';
-import { LibraryManager, SentenceManager, StudyManager } from './db';
-import { useSentenceStore } from './stores/SentenceStore';
+import { RouterView } from 'vue-router'
+import { onBeforeUnmount, onMounted, reactive, watchEffect } from 'vue';
+
+// import { DB } from './db/dexie';
+// import { LibraryManager, SentenceManager, StudyManager } from './db';
+// import { useSentenceStore } from './stores/SentenceStore';
+// onMounted(() => {
+//   window.DB = DB;
+//   window.LibraryManager = LibraryManager;
+//   window.StudyManager = StudyManager;
+//   window.SentenceManager = SentenceManager;
+//   window.useSentenceStore = useSentenceStore;
+// });
+
 let html = document.querySelector("html");
 let body = document.querySelector("body");
-onMounted(() => {
-  window.DB = DB;
-  window.LibraryManager = LibraryManager;
-  window.StudyManager = StudyManager;
-  window.SentenceManager = SentenceManager;
-  window.useSentenceStore = useSentenceStore;
-});
 let appsize = reactive({
   width: 0,
   height: 0
@@ -64,5 +66,4 @@ watchEffect(() => {
   overflow: hidden;
   font-size: 5rem;
 }
-
 </style>
