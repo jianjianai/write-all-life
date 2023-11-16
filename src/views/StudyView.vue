@@ -4,6 +4,7 @@ import { type StudyPrototype, StudyManager, type WordPrototype } from '@/db';
 import type { SentencePrototype } from '@/db/class';
 import { useSentenceStore } from '@/stores/SentenceStore';
 import { useStudyStore } from '@/stores/StudyStore';
+import type { FuseResult } from 'fuse.js';
 import { type Ref, ref, watch, toRefs, onUnmounted, computed } from 'vue';
 
 const { workType } = defineProps<{
@@ -113,30 +114,53 @@ const nextStudying = () => {
 const flishAll = ref(false);
 const studying: Ref<{ study: Studying, ok: () => void, on: () => void } | undefined> = ref(undefined);
 const studyingWord: Ref<WordPrototype | undefined> = ref(undefined);
-const studyingSenence = computed(() => {
-  //查找句子
+const studyingSenence:Ref<SentencePrototype|undefined> = ref(undefined);
+const sentenceArray:Ref<FuseResult<SentencePrototype>[]|undefined> = ref(undefined);;
+const search = ()=>{
+    //查找句子
   if (sentenceFuseloinging.value) {
-    return undefined;
+    sentenceArray.value = undefined;
+     return;
   }
   if (!studyingWord.value) {
-    return undefined;
+    sentenceArray.value = undefined;
+    return;
   }
-  let sentenceArray = sentenceFuse.value!.search(studyingWord.value.word);
-  while (sentenceArray.length > 0) {
-    let index = Math.floor(sentenceArray.length * Math.random());
-    let sentence = sentenceArray[index].item;
-    sentenceArray.splice(index, 1);
-    if (sentence.sentence.indexOf(studyingWord.value.word) >= 0) {
-      return sentence;
+  sentenceArray.value =  sentenceFuse.value!.search(studyingWord.value.word);
+}
+watch([sentenceFuseloinging,studyingWord],search);
+const findSenence = ()=>{
+  //查找其中一个
+  if (!sentenceArray.value) {
+    studyingSenence.value = undefined;
+    return;
+  }
+  while (sentenceArray.value.length > 0) {
+    let index = Math.floor(sentenceArray.value.length * Math.random());
+    let sentence = sentenceArray.value[index].item;
+    sentenceArray.value.splice(index, 1);
+    if (sentence.sentence.indexOf(studyingWord.value!.word) >= 0) {
+      studyingSenence.value = sentence;
+      return;
     }
   }
-});
+  studyingSenence.value = undefined;
+}
+watch([sentenceFuseloinging, studyingWord], findSenence);
 watch(studying, () => {
   studyingWord.value = undefined;
   studying.value?.study.study.getWord().then((o) => {
     studyingWord.value = o;
   });
 });
+
+//换句子
+const reFindSenenceClick = ()=>{
+  if(!sentenceArray.value ||sentenceArray.value.length<=0){
+    search();
+  }
+  findSenence();
+}
 
 //没学完的要还回去
 onUnmounted(() => {
@@ -189,40 +213,6 @@ if (workType == "study") {
 } else {
   loadNeedStudyArraysError.value = "错误,错误的workType:" + studying;
 }
-
-// StudyManager.getStudyingLibrary().then((studying) => {
-//   if (workType == "study") {//学习模式返回需要学习的词库
-//     if (!studying) {
-//       throw "错误，当前没有使用任何题库！";
-//     }
-//     return StudyManager.newStudyArray(studying);
-
-//   } else if (workType == "review") {//复习模式返回需要复习的词库
-//     return StudyManager.needReviewArray(new Date());
-
-//   } else {
-//     throw "错误,错误的workType:" + studying;
-//   }
-// }).then((array) => {
-//   studyAllArrays.value = array;
-// }).then(() => {
-//   //需要学习的个数
-//   needStudyNumber.value = Math.min(10, studyAllArrays.value!.length);
-//   //讲即将学习的词添加到学习队列
-//   for (let i = 0; i < needStudyNumber.value && studyAllArrays.value!.length > 0; i++) {
-//     let study = studyAllArrays.value!.shift();
-//     studyingArray.value.push(new Studying(needStudyTime(study!), study!));
-//   }
-//   //初始化学习组件
-//   studying.value = nextStudying();
-//   if (!studying.value) {
-//     flishAll.value = true;
-//   }
-//   //结束加载状态
-//   longing.value = false;
-// }).catch((e) => {
-//   loadNeedStudyArraysError.value = e;
-// });
 
 
 //页面学习逻辑
@@ -297,6 +287,7 @@ watch(inputWord, () => {
               <p v-else-if="!studyingSenence" style="font-size: 3rem;">没找到包含此词语的句子</p>
               <PinyinText v-else class="cShsow" :text="studyingSenence.sentence" :word="studyingWord.word"
                 :inputWord="inputWord" :shwoWord="watching" />
+              <button @click="reFindSenenceClick">换一换</button>
             </div>
           </template>
         </div>
@@ -315,11 +306,11 @@ watch(inputWord, () => {
 
   <!-- 调试 -->
   <!-- <div style="border: 1px solid green;" id="text">
-        <div>调试信息</div>
-        <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
-        <div>{{ studyingIndex }}</div>
-        <div style="font-size: 3rem;"> {{ studying }}</div>
-      </div> -->
+            <div>调试信息</div>
+            <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+            <div>{{ studyingIndex }}</div>
+            <div style="font-size: 3rem;"> {{ studying }}</div>
+          </div> -->
 </template>
   
 <style scoped>
