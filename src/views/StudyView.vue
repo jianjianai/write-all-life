@@ -285,11 +285,11 @@ watch(inputWord, () => {
               <PinyinText class="mainShsowP" :text="studyingWord.word" :word="studyingWord.word" :inputWord="inputWord"
                 :shwoWord="watching" />
             </div>
-            
+
             <div>
               <p class="message">{{ message }}</p>
               <input type="text" :maxlength="studyingWord ? studyingWord.word.length : 1" v-model="inputWord"
-              @keydown.enter="check">
+              @keydown.enter="check"><input type="button" value="检查" @click="check">
             </div>
 
             <div class="cShsowDiv">
