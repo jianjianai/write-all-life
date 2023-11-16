@@ -285,6 +285,13 @@ watch(inputWord, () => {
               <PinyinText class="mainShsowP" :text="studyingWord.word" :word="studyingWord.word" :inputWord="inputWord"
                 :shwoWord="watching" />
             </div>
+            
+            <div>
+              <p class="message">{{ message }}</p>
+              <input type="text" :maxlength="studyingWord ? studyingWord.word.length : 1" v-model="inputWord"
+              @keydown.enter="check">
+            </div>
+
             <div class="cShsowDiv">
               <p v-if="sentenceFuseloinging" style="font-size: 3rem;">loinging..</p>
               <p v-else-if="!studyingSenence" style="font-size: 3rem;">没找到包含此词语的句子</p>
@@ -292,12 +299,6 @@ watch(inputWord, () => {
                 :inputWord="inputWord" :shwoWord="watching" />
             </div>
           </template>
-
-          <div>
-            <p class="message">{{ message }}</p>
-          </div>
-          <input type="text" :maxlength="studyingWord ? studyingWord.word.length : 1" v-model="inputWord"
-            @keydown.enter="check">
         </div>
 
         <div class="pageButtons">
@@ -314,11 +315,11 @@ watch(inputWord, () => {
 
   <!-- 调试 -->
   <!-- <div style="border: 1px solid green;" id="text">
-    <div>调试信息</div>
-    <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
-    <div>{{ studyingIndex }}</div>
-    <div style="font-size: 3rem;"> {{ studying }}</div>
-  </div> -->
+      <div>调试信息</div>
+      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+      <div>{{ studyingIndex }}</div>
+      <div style="font-size: 3rem;"> {{ studying }}</div>
+    </div> -->
 </template>
   
 <style scoped>
