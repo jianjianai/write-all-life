@@ -55,7 +55,7 @@ watch([inputWord], () => { xxxxxsssss() }, { immediate: false });
     <p class="pinyinP">
     <div v-for="{ ty,t, up, is_ } of shwoArray" :class="{ aChar: true, mChar: is_ }">
         <div class="top">{{ up }}</div>
-        <div :class="{ char: true, _char: is_, __char:(!is_&& !shwoWord) ,wordError:((!shwoWord)&&(t)&&(ty!=t)) }">{{ shwoWord?ty:(t ? t : "■")  }}</div>
+        <div :class="{ char: true, _char: is_, __char:(!t && !shwoWord) ,wordError:((!shwoWord)&&(t)&&(ty!=t)) }">{{ shwoWord?ty:(t ? t : "■")  }}</div>
     </div>
     </p>
 </template>

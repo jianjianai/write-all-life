@@ -289,7 +289,7 @@ watch(inputWord, () => {
             <div>
               <p class="message">{{ message }}</p>
               <input type="text" :maxlength="studyingWord ? studyingWord.word.length : 1" v-model="inputWord"
-              @keydown.enter="check"><input type="button" value="检查" @click="check">
+                @keydown.enter="check"><input type="button" value="检查" @click="check">
             </div>
 
             <div class="cShsowDiv">
@@ -315,11 +315,11 @@ watch(inputWord, () => {
 
   <!-- 调试 -->
   <!-- <div style="border: 1px solid green;" id="text">
-      <div>调试信息</div>
-      <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
-      <div>{{ studyingIndex }}</div>
-      <div style="font-size: 3rem;"> {{ studying }}</div>
-    </div> -->
+        <div>调试信息</div>
+        <div style="font-size: 3rem;" v-for="a of studyingArray">{{ a }}</div>
+        <div>{{ studyingIndex }}</div>
+        <div style="font-size: 3rem;"> {{ studying }}</div>
+      </div> -->
 </template>
   
 <style scoped>
@@ -374,6 +374,7 @@ watch(inputWord, () => {
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
+  align-items: center;
 }
 
 .pageButtons {
