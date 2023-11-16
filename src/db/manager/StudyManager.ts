@@ -45,7 +45,7 @@ export default {
             wordArray.push(wordObj as StudyPrototype)
         }
         for(const id of wordIdNewArray){
-            const theObj = { wordid: id, schedule: 1, next: 0 };
+            const theObj = { wordid: id, schedule: 0, next: 0 };
             Object.setPrototypeOf(theObj, StudyPrototype.prototype);
             wordArray.push(theObj as StudyPrototype)
         }

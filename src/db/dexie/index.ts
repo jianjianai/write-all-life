@@ -22,7 +22,7 @@ export interface Study {//学习进度
     id?: number,
     wordid: number,//词语id
     /*
-    1~7 1代表初次学习，7代表已经完成记住
+0~10 0代表重来没有学习过，不知道会不会 1代表初次学习，7代表已经完成记住
      */
     schedule: number,//进度
     next: number,//下次复习时间

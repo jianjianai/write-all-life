@@ -50,7 +50,10 @@ const needStudyNumber = ref(0);
  * 获取需要学习的次数
  */
 const needStudyTime = (study: StudyPrototype) => {
-  if (study.schedule <= 1) {//如果是初次学习则需要记住3次
+  if(study.schedule == 0){//如果是新单词则只用学习一次
+    return 1;
+  }
+  if (study.schedule == 1) {//如果是新单词并且不会则学习三次
     return 3;
   }
   //否者记住一次

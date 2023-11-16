@@ -25,7 +25,7 @@ export default class StudyPrototype implements Study, DBUpdate {
     id?: number;
     wordid!: number;
     /**
-    1~10 1代表初次学习，7代表已经完成记住
+    0~10 0代表重来没有学习过，不知道会不会 1代表初次学习，7代表已经完成记住
     */
     schedule!: number;
     next!: number;
@@ -54,6 +54,9 @@ export default class StudyPrototype implements Study, DBUpdate {
      */
     setNextlearn() {
         let time = nextStudyWaitTime[this.schedule];
+        if(this.schedule==0){//如果第一次看就会那肯定就会
+            this.schedule = 2;
+        }
         if (this.schedule < 10) {
             this.schedule = this.schedule + 1;
         }
