@@ -8,14 +8,14 @@ import { WordsManager } from "..";
 const nextStudyWaitTime: { [key: number]: number } = {
     1: 1 * 24 * 60 * 60 * 1000,//一天
     2: 2 * 24 * 60 * 60 * 1000,//两天
-    3: 4 * 24 * 60 * 60 * 1000,
-    4: 7 * 24 * 60 * 60 * 1000,
-    5: 15 * 24 * 60 * 60 * 1000,
-    6: 30 * 24 * 60 * 60 * 1000,
-    7: 60 * 24 * 60 * 60 * 1000,
-    8: 120 * 24 * 60 * 60 * 1000,
-    9: 365 * 24 * 60 * 60 * 1000,
-    10: 3650 * 24 * 60 * 60 * 1000,
+    3: 4 * 24 * 60 * 60 * 1000,//四天
+    4: 7 * 24 * 60 * 60 * 1000,//七天
+    5: 15 * 24 * 60 * 60 * 1000,//15天
+    6: 30 * 24 * 60 * 60 * 1000,//30天
+    7: 60 * 24 * 60 * 60 * 1000,//60天
+    8: 120 * 24 * 60 * 60 * 1000,//120天
+    9: 365 * 24 * 60 * 60 * 1000,//365天
+    10: 3650 * 24 * 60 * 60 * 1000,//3650天
 }
 export default class StudyPrototype implements Study, DBUpdate {
     constructor() { throw new Error("不可使用构造方法构造！"); }
@@ -53,14 +53,27 @@ export default class StudyPrototype implements Study, DBUpdate {
      * 进入下一次学习
      */
     setNextlearn() {
-        let time = nextStudyWaitTime[this.schedule];
-        if(this.schedule==0){//如果第一次看就会那肯定就会
-            this.schedule = 2;
+        if(this.schedule==0){//如果第一次看就会那肯定就会，直接下个星期再复习
+            this.schedule = 4;
         }
-        if (this.schedule < 10) {
+        //计算下次学习时间
+        let now = new Date().getTime();
+        while(true){
+            if(this.schedule >= 10){
+                //如果已经是大于10年的状态，就继续10年
+                this.next = now + nextStudyWaitTime[10] - (12* 60 * 60 * 1000);//当前时间加上下次学习时间减去12个小时。
+                break;
+            }
+            
+            //计算下个复习周期
+            let time = nextStudyWaitTime[this.schedule];
             this.schedule = this.schedule + 1;
+            this.next = this.next + time;
+            if(this.next > now){
+                this.next = now + time - (12* 60 * 60 * 1000);//当前时间加上下次学习时间减去12个小时。
+                break;
+            }
         }
-        this.next = Date.now()+time-(12* 60 * 60 * 1000);//当前时间加上下次学习时间减去12个小时。
     }
 
 }

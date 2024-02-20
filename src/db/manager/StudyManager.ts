@@ -23,6 +23,14 @@ export default {
         }
         return objArray as Array<StudyPrototype>;
     },
+    //获取正在学习中的，全部学习进度
+    async getStudyingArray(offset:number,limit:number):Promise<Array<StudyPrototype>>{
+        let objArray = await DB.stuby.offset(offset).limit(limit).toArray();
+        for (const the of objArray) {
+            Object.setPrototypeOf(the, StudyPrototype.prototype);
+        }
+        return objArray as Array<StudyPrototype>;
+    },
     //获取指定词库还没学习的新进度
     async newStudyArray(library: LibraryPrototype) {
         let library_wordObjArray = await DB.library_word.where("libraryid").equals(library.id!).toArray();
@@ -65,5 +73,11 @@ export default {
             return undefined;
         }
         return await LibraryManager.get(Number(studying));
+    },
+    /**
+     * 全部句子的数量
+     */
+    async count(){
+        return await DB.stuby.count();
     }
 };

@@ -25,6 +25,7 @@ watch(pageNumber, () => {
         sentenceArray.value = v;
     });
 }, { immediate: true });
+
 const remove = (index: number) => {
     let sentence = sentenceArray.value![index];
     sentenceArray.value!.splice(index, 1);

@@ -44,6 +44,7 @@ const {
     <header class="header">
       <RouterLink class="link" to="/library">词库</RouterLink>
       <RouterLink class="link" to="/sentence/1">句子</RouterLink>
+      <RouterLink class="link" to="/studyings/1">学习中</RouterLink>
       <RouterLink class="link" to="/about">关于</RouterLink>
     </header>
   </div>
