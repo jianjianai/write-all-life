@@ -48,23 +48,25 @@ export default class StudyPrototype implements Study, DBUpdate {
      */
     setRelearn() {
         this.schedule = 1;
+        this.next = new Date().getTime()-1;
     }
     /**
      * 进入下一次学习
      */
     setNextlearn() {
-        if(this.schedule==0){//如果第一次看就会那肯定就会，直接下个星期再复习
-            this.schedule = 4;
+        let now = new Date().getTime();
+        if(this.schedule==0){//如果第一次看就会那肯定就会，直接下月再复习
+            this.next = now-1;
+            this.schedule = 6;
         }
         //计算下次学习时间
-        let now = new Date().getTime();
         while(true){
             if(this.schedule >= 10){
                 //如果已经是大于10年的状态，就继续10年
                 this.next = now + nextStudyWaitTime[10] - (12* 60 * 60 * 1000);//当前时间加上下次学习时间减去12个小时。
                 break;
             }
-            
+
             //计算下个复习周期
             let time = nextStudyWaitTime[this.schedule];
             this.schedule = this.schedule + 1;
